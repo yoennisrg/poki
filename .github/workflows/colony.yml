@@ -40,7 +40,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .ants
-          file: body
+          file: .ants/body
           push: true
           tags: ghcr.io/${{ github.repository }}/ant-body:latest
           cache-from: type=gha
