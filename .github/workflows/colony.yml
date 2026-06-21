@@ -140,11 +140,6 @@ jobs:
           apt-get update
           apt-get install -y ripgrep
 
-      - name: ⚡ Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
       - name: 🐜 Awakening the Drone
         uses: 'google-github-actions/run-gemini-cli@v0.1.22'
         env:
@@ -170,27 +165,11 @@ jobs:
                   "outfile": ".gemini/telemetry.log"
                 },
                 "mcpServers": {
-                  "git": {
-                    "args": [
-                      "mcp-server-git"
-                    ],
-                    "command": "/github/home/.local/bin/uvx"
-                  },
-                  "playwright": {
-                    "command": "npx",
-                    "args": [
-                      "-y",
-                      "@modelcontextprotocol/server-playwright"
-                    ]
-                  },
                   "brave-search": {
                     "command": "npx",
-                    "args": [
-                      "-y",
-                      "@modelcontextprotocol/server-brave-search"
-                    ],
+                    "args": ["-y", "@modelcontextprotocol/server-brave-search"],
                     "env": {
-                      "BRAVE_API_KEY": "$BRAVE_API_KEY"
+                      "BRAVE_API_KEY": "BSAjMhL6aclOg6ZgjhnlO4E-BaKctko"
                     }
                   }
                 },
@@ -229,12 +208,8 @@ jobs:
           echo "- Debug: \`true\`" >> $GITHUB_STEP_SUMMARY
           echo "- Output Format: \`stream-json\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### MCP Servers" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ git (uvx)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ github (docker)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ filesystem (npx)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ shell (npx)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ playwright (npx)" >> $GITHUB_STEP_SUMMARY
+          echo "### Tools" >> $GITHUB_STEP_SUMMARY
+          echo "- Built-in core tools (shell, read_file, write_file)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
           echo "- 📊 [Telemetry](../actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
