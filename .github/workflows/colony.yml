@@ -13,7 +13,7 @@ on:
         description: 'Gemini model to use'
         required: false
         type: string
-        default: 'gemini-2.5-flash-001'
+        default: 'gemini-2.5-flash-preview-05-20'
 
 jobs:
   build-image:
@@ -151,7 +151,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           gemini_api_key: ${{ secrets.ANTS_AI_KEY }}
-          gemini_model: ${{ github.event.inputs.model || 'gemini-2.5-flash-001' }}
+          gemini_model: ${{ github.event.inputs.model || 'gemini-2.5-flash-preview-05-20' }}
           gemini_debug: true
           prompt: ${{ steps.ant-brain.outputs.prompt }}
           upload_artifacts: true
@@ -160,7 +160,7 @@ jobs:
                 "approvalMode": "yolo",
                 "debug": true,
                 "model": {
-                  "name": "gemini-2.5-flash-001"
+                  "name": "gemini-2.5-flash-preview-05-20"
                 },
                 "telemetry": {
                   "enabled": true,
@@ -213,7 +213,7 @@ jobs:
           echo "## 🐜 Ant Mission Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Agent:** ${{ env.AGENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Model:** ${{ github.event.inputs.model || 'gemini-2.5-flash-001' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Model:** ${{ github.event.inputs.model || 'gemini-2.5-flash-preview-05-20' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Environment" >> $GITHUB_STEP_SUMMARY
