@@ -299,10 +299,76 @@ body {
   color: #fbbf24;
 }
 
+.card__favorite {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(21, 25, 34, 0.85);
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.card__favorite:hover,
+.card__favorite:focus-visible {
+  color: var(--text);
+  background: var(--surface-hover);
+  outline: none;
+}
+
+.card__favorite[aria-pressed="true"] {
+  color: var(--danger);
+}
+
+.card__favorite:active {
+  transform: scale(0.92);
+}
+
 .empty {
   text-align: center;
+  padding: 48px 20px;
+}
+
+.empty__title {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.empty__hint {
+  margin: 0 0 18px;
   color: var(--text-muted);
-  padding: 40px 20px;
+  font-size: 0.95rem;
+}
+
+.empty__action {
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface-hover);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.empty__action:hover,
+.empty__action:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  outline: none;
 }
 
 /* Footer */
@@ -389,6 +455,46 @@ body {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+.preview__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.preview__favorite {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface-hover);
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.preview__favorite:hover,
+.preview__favorite:focus-visible {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+.preview__favorite[aria-pressed="true"] {
+  color: var(--danger);
+}
+
+.preview__favorite:active {
+  transform: scale(0.92);
 }
 
 .preview__meta {
