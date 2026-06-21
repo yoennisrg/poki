@@ -1,150 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Poki — Marketplace de Apps HTML5</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <header class="header">
-    <div class="container header__inner">
-      <a href="#" class="logo" aria-label="Poki inicio">
-        <span class="logo__icon" aria-hidden="true">🎮</span>
-        <span class="logo__text">Poki</span>
-      </a>
-      <div class="search" role="search">
-        <label for="search-input" class="visually-hidden">Buscar juegos y apps</label>
-        <input
-          id="search-input"
-          class="search__input"
-          type="search"
-          placeholder="Buscar juegos, apps, géneros..."
-          autocomplete="off"
-        />
-      </div>
-    </div>
-  </header>
-
-  <nav class="categories" aria-label="Categorías">
-    <div class="container">
-      <ul class="categories__list" id="categories-list">
-        <li><button class="categories__btn is-active" data-category="all">Todos</button></li>
-        <li><button class="categories__btn" data-category="acción">Acción</button></li>
-        <li><button class="categories__btn" data-category="aventura">Aventura</button></li>
-        <li><button class="categories__btn" data-category="puzzle">Puzzle</button></li>
-        <li><button class="categories__btn" data-category="carreras">Carreras</button></li>
-        <li><button class="categories__btn" data-category="deportes">Deportes</button></li>
-        <li><button class="categories__btn" data-category="casual">Casual</button></li>
-      </ul>
-    </div>
-  </nav>
-
-  <main class="main">
-    <div class="container">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero__content">
-          <h1 id="hero-title" class="hero__title">Juega al instante, sin instalaciones</h1>
-          <p class="hero__subtitle">Descubre miles de juegos y apps HTML5 que corren directamente en tu navegador.</p>
-        </div>
-      </section>
-
-      <section class="section" id="favorites-section" aria-labelledby="favorites-title" hidden>
-        <div class="section__header">
-          <h2 id="favorites-title" class="section__title">❤️ Tus favoritos</h2>
-          <button class="section__action" id="clear-favorites" type="button">Limpiar</button>
-        </div>
-        <div class="grid" id="favorites-grid"></div>
-      </section>
-
-      <section class="section" id="recents-section" aria-labelledby="recents-title" hidden>
-        <div class="section__header">
-          <h2 id="recents-title" class="section__title">🕓 Jugados recientemente</h2>
-          <button class="section__action" id="clear-recents" type="button">Limpiar</button>
-        </div>
-        <div class="grid" id="recents-grid"></div>
-      </section>
-
-      <section class="section" aria-labelledby="trending-title">
-        <div class="section__header">
-          <h2 id="trending-title" class="section__title">🔥 Tendencias</h2>
-        </div>
-        <div class="grid" id="trending-grid"></div>
-      </section>
-
-      <section class="section" aria-labelledby="catalog-title">
-        <div class="section__header">
-          <h2 id="catalog-title" class="section__title">Explorar todo</h2>
-          <p class="section__count" id="catalog-count"></p>
-        </div>
-        <div class="grid" id="catalog-grid"></div>
-        <div class="empty" id="empty-state" hidden>
-          <p class="empty__title">No encontramos resultados</p>
-          <p class="empty__hint">Prueba con otra búsqueda o selecciona una categoría diferente.</p>
-          <button class="empty__action" id="empty-clear-btn" type="button">Limpiar filtros</button>
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <footer class="footer">
-    <div class="container">
-      <p>Marketplace de Apps HTML5 · MVP de producto</p>
-    </div>
-  </footer>
-
-  <div class="modal modal--preview" id="preview-modal" role="dialog" aria-modal="true" aria-label="Vista previa de app" hidden>
-    <div class="modal__overlay" id="preview-overlay"></div>
-    <div class="modal__content modal__content--preview">
-      <button class="modal__close" id="preview-close-btn" aria-label="Cerrar vista previa">✕</button>
-      <div class="preview__icon" id="preview-icon" aria-hidden="true"></div>
-      <div class="preview__header">
-        <h2 class="preview__title" id="preview-title"></h2>
-        <button class="preview__favorite" id="preview-favorite-btn" type="button" aria-pressed="false" aria-label="Añadir a favoritos">♡</button>
-      </div>
-      <div class="preview__meta">
-        <span class="preview__category" id="preview-category"></span>
-        <span class="preview__rating" id="preview-rating"></span>
-      </div>
-      <p class="preview__description" id="preview-description"></p>
-      <button class="preview__play" id="preview-play-btn" type="button">▶ Jugar ahora</button>
-    </div>
-  </div>
-
-  <div class="modal" id="player-modal" role="dialog" aria-modal="true" aria-label="Reproductor de app" hidden>
-    <div class="modal__overlay" id="player-overlay"></div>
-    <div class="modal__content">
-      <div class="player__bar">
-        <h3 class="player__title" id="player-title"></h3>
-        <div class="player__actions">
-          <button class="player__btn" id="fullscreen-btn" aria-label="Pantalla completa">⛶</button>
-          <button class="player__btn player__btn--close" id="close-player" aria-label="Cerrar reproductor">✕</button>
-        </div>
-      </div>
-      <div class="player__frame-wrapper" id="player-wrapper">
-        <div class="player__loader" id="player-loader" hidden>
-          <span class="player__spinner" aria-hidden="true"></span>
-          <span>Cargando juego…</span>
-        </div>
-        <div class="player__error" id="player-error" hidden>
-          <p>No pudimos cargar el juego.</p>
-          <p class="player__error-hint">Puede deberse a restricciones del sitio externo. Prueba con otro título.</p>
-        </div>
-        <iframe
-          id="player-iframe"
-          class="player__iframe"
-          loading="lazy"
-          allow="fullscreen"
-          sandbox="allow-scripts allow-same-origin allow-popups"
-          title="App embebida"
-        ></iframe>
-      </div>
-    </div>
-  </div>
-
-  <script src="app.js" defer></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Poki — Marketplace de Apps HTML5</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
