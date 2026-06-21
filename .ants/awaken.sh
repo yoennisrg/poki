@@ -34,6 +34,6 @@ fi
 # Starting work
 echo "🔨 Beginning work..."
 PROMPT=$(cat ".ants/gallery/$ANT.md")$'\n\n'$(cat ".ants/pheromones/instinct.md")
-opencode --model "$ANTS_MODEL" run "$PROMPT" || echo "❌ Work failed, keeping ant alive for debugging"
+opencode --model "$ANTS_MODEL" run "$PROMPT" --dangerously-skip-permissions || echo "❌ Work failed, keeping ant alive for debugging"
 
 echo "✅ Ant $ANT completed mission"
