@@ -52,6 +52,14 @@
         </div>
       </section>
 
+      <section class="section" id="favorites-section" aria-labelledby="favorites-title" hidden>
+        <div class="section__header">
+          <h2 id="favorites-title" class="section__title">❤️ Tus favoritos</h2>
+          <button class="section__action" id="clear-favorites" type="button">Limpiar</button>
+        </div>
+        <div class="grid" id="favorites-grid"></div>
+      </section>
+
       <section class="section" id="recents-section" aria-labelledby="recents-title" hidden>
         <div class="section__header">
           <h2 id="recents-title" class="section__title">🕓 Jugados recientemente</h2>
@@ -73,7 +81,11 @@
           <p class="section__count" id="catalog-count"></p>
         </div>
         <div class="grid" id="catalog-grid"></div>
-        <p class="empty" id="empty-state" hidden>No encontramos resultados. Prueba con otra búsqueda o categoría.</p>
+        <div class="empty" id="empty-state" hidden>
+          <p class="empty__title">No encontramos resultados</p>
+          <p class="empty__hint">Prueba con otra búsqueda o selecciona una categoría diferente.</p>
+          <button class="empty__action" id="empty-clear-btn" type="button">Limpiar filtros</button>
+        </div>
       </section>
     </div>
   </main>
@@ -89,7 +101,10 @@
     <div class="modal__content modal__content--preview">
       <button class="modal__close" id="preview-close-btn" aria-label="Cerrar vista previa">✕</button>
       <div class="preview__icon" id="preview-icon" aria-hidden="true"></div>
-      <h2 class="preview__title" id="preview-title"></h2>
+      <div class="preview__header">
+        <h2 class="preview__title" id="preview-title"></h2>
+        <button class="preview__favorite" id="preview-favorite-btn" type="button" aria-pressed="false" aria-label="Añadir a favoritos">♡</button>
+      </div>
       <div class="preview__meta">
         <span class="preview__category" id="preview-category"></span>
         <span class="preview__rating" id="preview-rating"></span>

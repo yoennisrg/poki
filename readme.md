@@ -84,4 +84,6 @@ Luego visita `http://localhost:8080`.
 - Reproductor embebido en iframe sandboxed con indicador de carga y mensaje de fallback.
 - Pantalla completa y cierre con tecla `Esc`.
 - Historial de "Jugados recientemente" persistido en localStorage.
+- Lista de "Favoritos" local para guardar apps y volver a ellas rápidamente.
+- Empty state accionable con botón para limpiar filtros cuando no hay resultados.
 - Diseño responsive para móvil y escritorio.

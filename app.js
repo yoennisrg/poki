@@ -123,6 +123,7 @@
   ];
 
   const RECENTS_KEY = "poki-recents";
+  const FAVORITES_KEY = "poki-favorites";
   const MAX_RECENTS = 6;
   const PLAYER_LOAD_TIMEOUT_MS = 4000;
 
@@ -130,12 +131,16 @@
     category: "all",
     query: "",
     recents: loadRecents(),
+    favorites: loadFavorites(),
     playerLoadTimer: null,
   };
 
   const els = {
     searchInput: document.getElementById("search-input"),
     categoriesList: document.getElementById("categories-list"),
+    favoritesSection: document.getElementById("favorites-section"),
+    favoritesGrid: document.getElementById("favorites-grid"),
+    clearFavoritesBtn: document.getElementById("clear-favorites"),
     recentsSection: document.getElementById("recents-section"),
     recentsGrid: document.getElementById("recents-grid"),
     clearRecentsBtn: document.getElementById("clear-recents"),
@@ -143,6 +148,7 @@
     catalogGrid: document.getElementById("catalog-grid"),
     catalogCount: document.getElementById("catalog-count"),
     emptyState: document.getElementById("empty-state"),
+    emptyClearBtn: document.getElementById("empty-clear-btn"),
     previewModal: document.getElementById("preview-modal"),
     previewOverlay: document.getElementById("preview-overlay"),
     previewIcon: document.getElementById("preview-icon"),
@@ -151,6 +157,7 @@
     previewRating: document.getElementById("preview-rating"),
     previewDescription: document.getElementById("preview-description"),
     previewPlayBtn: document.getElementById("preview-play-btn"),
+    previewFavoriteBtn: document.getElementById("preview-favorite-btn"),
     previewCloseBtn: document.getElementById("preview-close-btn"),
     playerModal: document.getElementById("player-modal"),
     playerOverlay: document.getElementById("player-overlay"),
@@ -201,6 +208,46 @@
     renderRecents();
   }
 
+  function loadFavorites() {
+    try {
+      const raw = localStorage.getItem(FAVORITES_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveFavorites(favorites) {
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    } catch {
+      // Silently ignore storage errors (e.g., private mode).
+    }
+  }
+
+  function isFavorite(id) {
+    return state.favorites.includes(id);
+  }
+
+  function toggleFavorite(id) {
+    if (isFavorite(id)) {
+      state.favorites = state.favorites.filter((fav) => fav !== id);
+    } else {
+      state.favorites = [id, ...state.favorites];
+    }
+    saveFavorites(state.favorites);
+    updateFavoriteButtons();
+    renderFavorites();
+  }
+
+  function clearFavorites() {
+    state.favorites = [];
+    saveFavorites(state.favorites);
+    updateFavoriteButtons();
+    renderFavorites();
+  }
+
   function getAppById(id) {
     return APPS.find((app) => app.id === id) || null;
   }
@@ -209,9 +256,11 @@
     const article = document.createElement("article");
     article.className = "card";
     article.setAttribute("tabindex", "0");
-    article.setAttribute("role", "button");
     article.setAttribute("aria-label", `Ver detalles de ${app.title}`);
+    const favorited = isFavorite(app.id);
+    const favoriteLabel = favorited ? "Quitar de favoritos" : "Añadir a favoritos";
     article.innerHTML = `
+      <button class="card__favorite" type="button" data-favorite-id="${app.id}" aria-pressed="${favorited}" aria-label="${favoriteLabel}">${favorited ? "♥" : "♡"}</button>
       <div class="card__thumb" aria-hidden="true">${escapeHtml(app.icon)}</div>
       <div class="card__body">
         <h3 class="card__title">${escapeHtml(app.title)}</h3>
@@ -229,6 +278,12 @@
         e.preventDefault();
         open();
       }
+    });
+
+    const favBtn = article.querySelector("[data-favorite-id]");
+    favBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleFavorite(app.id);
     });
     return article;
   }
@@ -267,6 +322,37 @@
     });
   }
 
+  function updateFavoriteButtons() {
+    document.querySelectorAll("[data-favorite-id]").forEach((btn) => {
+      const id = Number(btn.dataset.favoriteId);
+      const favorited = isFavorite(id);
+      btn.setAttribute("aria-pressed", String(favorited));
+      btn.setAttribute("aria-label", favorited ? "Quitar de favoritos" : "Añadir a favoritos");
+      btn.textContent = favorited ? "♥" : "♡";
+    });
+  }
+
+  function renderFavorites() {
+    els.favoritesGrid.innerHTML = "";
+
+    if (state.favorites.length === 0) {
+      els.favoritesSection.hidden = true;
+      return;
+    }
+
+    const isHomeView = !state.query && state.category === "all";
+    els.favoritesSection.hidden = !isHomeView;
+
+    if (!isHomeView) return;
+
+    state.favorites.forEach((id) => {
+      const app = getAppById(id);
+      if (app) {
+        els.favoritesGrid.appendChild(createCard(app));
+      }
+    });
+  }
+
   function render() {
     const filtered = getFilteredApps();
     const trending = filtered.filter((app) => app.trending);
@@ -278,6 +364,7 @@
       els.emptyState.hidden = false;
       els.catalogCount.textContent = "0 resultados";
       els.trendingGrid.closest(".section").hidden = true;
+      renderFavorites();
       renderRecents();
       return;
     }
@@ -296,6 +383,7 @@
     }
 
     filtered.forEach((app) => els.catalogGrid.appendChild(createCard(app)));
+    renderFavorites();
     renderRecents();
   }
 
@@ -307,12 +395,20 @@
     render();
   }
 
+  function clearFilters() {
+    state.query = "";
+    state.category = "all";
+    els.searchInput.value = "";
+    setCategory("all");
+  }
+
   function openPreview(app) {
     els.previewIcon.textContent = app.icon;
     els.previewTitle.textContent = app.title;
     els.previewCategory.textContent = app.category;
     els.previewRating.textContent = `★ ${app.rating.toFixed(1)}`;
     els.previewDescription.textContent = app.description;
+    updatePreviewFavoriteButton(app.id);
     els.previewModal.hidden = false;
     document.body.style.overflow = "hidden";
     els.previewCloseBtn.focus();
@@ -324,6 +420,15 @@
 
     els.previewPlayBtn.onclick = playHandler;
     els.previewPlayBtn.dataset.appId = app.id;
+    els.previewFavoriteBtn.dataset.favoriteId = app.id;
+    els.previewFavoriteBtn.onclick = () => toggleFavorite(app.id);
+  }
+
+  function updatePreviewFavoriteButton(id) {
+    const favorited = isFavorite(id);
+    els.previewFavoriteBtn.setAttribute("aria-pressed", String(favorited));
+    els.previewFavoriteBtn.setAttribute("aria-label", favorited ? "Quitar de favoritos" : "Añadir a favoritos");
+    els.previewFavoriteBtn.textContent = favorited ? "♥" : "♡";
   }
 
   function closePreview() {
@@ -331,6 +436,8 @@
     document.body.style.overflow = "";
     els.previewPlayBtn.onclick = null;
     els.previewPlayBtn.dataset.appId = "";
+    els.previewFavoriteBtn.onclick = null;
+    delete els.previewFavoriteBtn.dataset.favoriteId;
   }
 
   function showPlayerLoader() {
@@ -401,6 +508,8 @@
     });
 
     els.clearRecentsBtn.addEventListener("click", clearRecents);
+    els.clearFavoritesBtn.addEventListener("click", clearFavorites);
+    els.emptyClearBtn.addEventListener("click", clearFilters);
 
     els.previewOverlay.addEventListener("click", closePreview);
     els.previewCloseBtn.addEventListener("click", closePreview);
