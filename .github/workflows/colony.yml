@@ -2,7 +2,7 @@ name: 🐜 Ants Colony
 
 on:
   pull_request:
-    types: [closed]
+    types: [opened, reopened, closed]
   workflow_dispatch:
     inputs:
       name:
@@ -53,8 +53,7 @@ jobs:
     name: 🔀 Auto Merge
     if: |
       github.event_name == 'pull_request' &&
-      github.event.action == 'closed' &&
-      github.event.pull_request.merged == false
+      (github.event.action == 'opened' || github.event.action == 'reopened')
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
