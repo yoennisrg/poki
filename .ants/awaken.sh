@@ -42,4 +42,14 @@ fi
 echo "🔨 Beginning work..."
 opencode --model "$ANTS_MODEL" run "$PROMPT" --dangerously-skip-permissions || echo "❌ Work failed, keeping ant alive for debugging"
 
+# Auto-merge open PR if exists
+echo "🔀 Looking for open PR to merge..."
+OPEN_PR=$(gh pr list --repo "$REPOSITORY" --state open --label "ant-$ANT" --json number --jq 'first | .number')
+if [[ -n "$OPEN_PR" && "$OPEN_PR" != "null" ]]; then
+  echo "🔀 Auto-merging PR #$OPEN_PR"
+  gh pr merge "$OPEN_PR" --repo "$REPOSITORY" --squash || echo "⚠️ Merge failed — may need manual merge"
+else
+  echo "No open PR found for ant-$ANT"
+fi
+
 echo "✅ Ant $ANT completed mission"
