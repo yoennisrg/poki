@@ -56,7 +56,7 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ github.token }}
-      options: --user root --entrypoint ""
+      options: --user root --entrypoint "" --network host
     permissions:
       id-token: write
       pull-requests: write
