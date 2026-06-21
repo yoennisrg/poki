@@ -25,6 +25,12 @@ INSTINCT_SIZE=$(wc -c < ".ants/pheromones/instinct.md" | tr -d ' ')
 echo "   🧬 Instinct: $INSTINCT_SIZE bytes"
 echo "   🧠 Total brain: $((BRAIN_SIZE + INSTINCT_SIZE)) bytes"
 
+# Auth
+if [ -n "$OPENCODE_API_KEY" ]; then
+  mkdir -p ~/.local/share/opencode
+  echo "{\"opencode\":{\"token\":\"$OPENCODE_API_KEY\"}}" > ~/.local/share/opencode/auth.json
+fi
+
 # Starting work
 echo "🔨 Beginning work..."
 PROMPT=$(cat ".ants/gallery/$ANT.md")$'\n\n'$(cat ".ants/pheromones/instinct.md")

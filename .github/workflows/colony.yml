@@ -10,10 +10,10 @@ on:
         required: true
         type: string
       model:
-        description: 'Gemini model to use'
+        description: 'AI model to use'
         required: false
         type: string
-        default: 'gemini-2.0-flash'
+        default: 'opencode-go/kimi-k2.7-code'
 
 jobs:
   build-image:
@@ -50,14 +50,6 @@ jobs:
     name: 🐜 Ant Mission
     needs: build-image
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/${{ github.repository }}/ant-body:latest
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ github.token }}
-      options: --user root --entrypoint ""
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
     permissions:
       id-token: write
       pull-requests: write
@@ -65,8 +57,6 @@ jobs:
       packages: read
     env:
       GH_TOKEN: ${{ github.token }}
-      ANTS_AI_KEY: ${{ secrets.ANTS_AI_KEY }}
-      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
 
     steps:
       - name: 🕳️ Descending into the Anthill
@@ -101,111 +91,26 @@ jobs:
             exit 1
           fi
 
-      - name: ⚒️ Equipping the Mandibles
-        run: |
-          git config --global user.name "🐜 ${{ env.AGENT }}"
-          git config --global user.email "${{ env.AGENT }}@ants.io"
-
-      - name: 🧠 Synaptic Link (Loading Brain)
-        id: ant-brain
-        shell: bash
-        run: |
-          FILE_NAME=$(echo "${{ env.AGENT }}" | tr '[:upper:]' '[:lower:]')
-          BRAIN_FILE=".ants/gallery/${FILE_NAME}.md"
-          INSTINCT_FILE=".ants/pheromones/instinct.md"
-
-          if [ ! -f "$BRAIN_FILE" ]; then
-            echo "❌ Error: Memory $BRAIN_FILE not found in gallery."
-            exit 1
-          fi
-
-          {
-            echo "prompt<<EOF"
-            cat "$BRAIN_FILE"
-            echo ""
-            if [ -f "$INSTINCT_FILE" ]; then
-              echo "---"
-              echo "System Instincts:"
-              cat "$INSTINCT_FILE"
-            fi
-            echo ""
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-          echo "🧠 $FILE_NAME memory and instincts loaded into ganglia."
-
-      - name: 🛠️ Install Dependencies
-        run: |
-          apt-get update
-          apt-get install -y ripgrep docker.io
-
-      - name: ⚡ Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: 🔐 Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - name: 🐜 Awakening the Drone
-        uses: 'google-github-actions/run-gemini-cli@v0.1.22'
-        env:
-          GEMINI_CLI_TRUST_WORKSPACE: true
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          gemini_api_key: ${{ secrets.ANTS_AI_KEY }}
-          gemini_model: ${{ github.event.inputs.model || 'gemini-2.0-flash' }}
-          gemini_debug: true
-          prompt: ${{ steps.ant-brain.outputs.prompt }}
-          upload_artifacts: true
-          settings: |-
-              {
-                "approvalMode": "yolo",
-                "debug": true,
-                "model": {
-                  "name": "gemini-2.0-flash"
-                },
-                "telemetry": {
-                  "enabled": true,
-                  "target": "local",
-                  "outfile": ".gemini/telemetry.log"
-                },
-                "mcpServers": {
-                  "git": {
-                    "command": "uvx",
-                    "args": ["mcp-server-git"]
-                  },
-                  "github": {
-                    "command": "docker",
-                    "args": [
-                      "run", "-i", "--rm",
-                      "-e", "GITHUB_PERSONAL_ACCESS_TOKEN=${{ github.token }}",
-                      "ghcr.io/github/github-mcp-server:v0.27.0"
-                    ]
-                  },
-                  "playwright": {
-                    "command": "npx",
-                    "args": ["-y", "@playwright/mcp"]
-                  },
-                  "brave-search": {
-                    "command": "npx",
-                    "args": ["-y", "@modelcontextprotocol/server-brave-search"],
-                    "env": {
-                      "BRAVE_API_KEY": "BSAjMhL6aclOg6ZgjhnlO4E-BaKctko"
-                    }
-                  }
-                },
-                "tools": {
-                  "core": ["all"]
-                }
-              }
-          extensions: |
-            []
-
-      - name: 📊 Upload Telemetry
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: ant-telemetry-${{ env.AGENT }}
-          path: .gemini/telemetry.log
-          if-no-files: warn
+        run: |
+          docker run --rm \
+            -e ANT="${{ env.AGENT }}" \
+            -e ANTS_MODEL="${{ github.event.inputs.model || 'opencode-go/kimi-k2.7-code' }}" \
+            -e REPOSITORY="${{ github.repository }}" \
+            -e BRANCH="main" \
+            -e EMAIL="${{ env.AGENT }}@ants.io" \
+            -e GH_TOKEN="${{ github.token }}" \
+            -e OPENCODE_API_KEY="${{ secrets.OPENCODE_API_KEY }}" \
+            -e BRAVE_API_KEY="${{ secrets.BRAVE_API_KEY }}" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            ghcr.io/${{ github.repository }}/ant-body:latest
 
       - name: 📋 Job Summary
         if: always()
@@ -213,32 +118,12 @@ jobs:
           echo "## 🐜 Ant Mission Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Agent:** ${{ env.AGENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Model:** ${{ github.event.inputs.model || 'gemini-2.0-flash' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Model:** ${{ github.event.inputs.model || 'opencode-go/kimi-k2.7-code' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Environment" >> $GITHUB_STEP_SUMMARY
           echo "- Runner: \`${{ runner.os }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- Workspace: \`${{ github.workspace }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### MCP Servers" >> $GITHUB_STEP_SUMMARY
-          echo "- git (uvx)" >> $GITHUB_STEP_SUMMARY
-          echo "- github (docker)" >> $GITHUB_STEP_SUMMARY
-          echo "- playwright (npx)" >> $GITHUB_STEP_SUMMARY
-          echo "- brave-search (npx)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
-          echo "- 📊 [Telemetry](../actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-          echo "- 📎 [Gemini Artifacts](../actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-
-      - name: 🔍 Debug Gemini CLI Output
-        if: always()
-        run: |
-          if [ -d gemini-artifacts ]; then
-            echo "=== STDERR ==="
-            cat gemini-artifacts/stderr.log 2>/dev/null || echo "not found"
-            echo "=== STDOUT ==="
-            cat gemini-artifacts/stdout.log 2>/dev/null || echo "not found"
-          fi
 
       - name: 🏁 Mission Accomplished
         run: echo "🍂 Collection finished for ${{ env.AGENT }}."
