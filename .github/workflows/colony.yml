@@ -15,6 +15,9 @@ on:
         type: string
         default: 'opencode-go/kimi-k2.7-code'
 
+env:
+  ANT_SEQUENCE: uma,carol,piper,kael,atlas,fiona,nova,vesper,echo,lyra
+
 jobs:
   build-image:
     name: 🏗️ Build Ant Body
@@ -46,9 +49,36 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  auto-merge:
+    name: 🔀 Auto Merge
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: 🔀 Merge if ant PR
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          AUTHOR_NAME=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json commits --jq '.commits[-1].commit.author.name')
+          if [[ "$AUTHOR_NAME" =~ ^🐜 ]]; then
+            echo "🐜 Ant PR detected — auto-merging #$PR_NUMBER"
+            gh pr merge $PR_NUMBER --repo ${{ github.repository }} --squash
+          else
+            echo "👤 Human PR — skipping auto-merge"
+          fi
+
   working:
     name: 🐜 Ant Mission
     needs: build-image
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -66,6 +96,8 @@ jobs:
         id: identify
         shell: bash
         run: |
+          SEQUENCE="${{ env.ANT_SEQUENCE }}"
+
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             AGENT_NAME="${{ github.event.inputs.name }}"
             echo "AGENT=$AGENT_NAME" >> $GITHUB_ENV
@@ -73,11 +105,29 @@ jobs:
           else
             AUTHOR_NAME=$(gh pr view ${{ github.event.pull_request.number }} --json commits --jq '.commits[-1].commit.author.name')
             if [[ "$AUTHOR_NAME" =~ 🐜\ (.+) ]]; then
-              echo "AGENT=${BASH_REMATCH[1]}" >> $GITHUB_ENV
-              echo "🧬 DNA detected: Ant ${BASH_REMATCH[1]}"
+              CURRENT_ANT="${BASH_REMATCH[1]}"
+              echo "🧬 DNA detected: Ant $CURRENT_ANT merged"
+
+              IFS=',' read -ra ANTS <<< "$SEQUENCE"
+              NEXT_ANT=""
+              for i in "${!ANTS[@]}"; do
+                if [[ "${ANTS[$i]}" == "$CURRENT_ANT" ]]; then
+                  NEXT_INDEX=$(( (i + 1) % ${#ANTS[@]} ))
+                  NEXT_ANT="${ANTS[$NEXT_INDEX]}"
+                  break
+                fi
+              done
+
+              if [[ -z "$NEXT_ANT" ]]; then
+                echo "⚠️ Ant $CURRENT_ANT not in sequence, defaulting to uma"
+                NEXT_ANT="uma"
+              fi
+
+              echo "AGENT=$NEXT_ANT" >> $GITHUB_ENV
+              echo "🔄 Next ant in sequence: $NEXT_ANT"
             else
-              echo "❌ Intruder detected: Author format must be '🐜 [NAME]'"
-              exit 1
+              echo "👤 Human PR merged — no ant to sequence"
+              exit 0
             fi
           fi
 
@@ -85,7 +135,8 @@ jobs:
         shell: bash
         run: |
           ANT="${{ env.AGENT }}"
-          OPEN_PRS=$(gh pr list --state open --repo ${{ github.repository }} --search "author:🐜 $ANT" --json number --jq '. | length')
+          if [[ -z "$ANT" ]]; then exit 0; fi
+          OPEN_PRS=$(gh pr list --state open --repo ${{ github.repository }} --label "ant-$ANT" --json number --jq '. | length')
           if [ "$OPEN_PRS" -ge 2 ]; then
             echo "🚨 Tunnel saturation: $ANT already has $OPEN_PRS active missions."
             exit 1
@@ -99,6 +150,7 @@ jobs:
           password: ${{ github.token }}
 
       - name: 🐜 Awakening the Drone
+        if: env.AGENT != ''
         run: |
           docker run --rm \
             -e ANT="${{ env.AGENT }}" \
@@ -116,14 +168,10 @@ jobs:
         if: always()
         run: |
           echo "## 🐜 Ant Mission Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Agent:** ${{ env.AGENT }}" >> $GITHUB_STEP_SUMMARY
           echo "**Model:** ${{ github.event.inputs.model || 'opencode-go/kimi-k2.7-code' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Environment" >> $GITHUB_STEP_SUMMARY
-          echo "- Runner: \`${{ runner.os }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Workspace: \`${{ github.workspace }}\`" >> $GITHUB_STEP_SUMMARY
 
       - name: 🏁 Mission Accomplished
+        if: env.AGENT != ''
         run: echo "🍂 Collection finished for ${{ env.AGENT }}."
