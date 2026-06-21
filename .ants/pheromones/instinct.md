@@ -41,7 +41,7 @@ Una vez elegida la tarea, la ejecución debe ser quirúrgica:
   3. **PUSH LA RAMA INMEDIATAMENTE**: `git push -u origin [NOMBRE_RAMA]`
   4. **Verifica que el label exista**: `gh label list | grep "ant-[TU_NOMBRE]" || gh label create "ant-[TU_NOMBRE]" --color "#00ff00" --description "Pull requests created by ant [TU_NOMBRE]"`
   5. **Valida el código antes de crear el PR**: Si el proyecto tiene linting (ej: `npm run lint`, `pnpm lint`), ejecútalo y corrige todos los errores/warnings antes de continuar.
-  6. Ejecuta `gh pr create --draft --label "ant-[TU_NOMBRE]"` con un título descriptivo y un body que detalle qué vas a modificar y dónde.
+  6. Ejecuta `gh pr create --label "ant-[TU_NOMBRE]"` con un título descriptivo y un body que detalle qué vas a modificar y dónde.
   7. Verifica que el PR Draft se haya creado exitosamente ejecutando `gh pr list --label "ant-[TU_NOMBRE]" --state open`.
   8. **NO procedas al Paso 1 sin haber completado este paso. No leas archivos de código fuente, no hagas análisis técnico, no escribas código hasta que el PR Draft esté publicado.**
   Esto es un aviso vinculante para que otros colaboradores no entren en tu zona de trabajo.
