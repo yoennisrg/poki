@@ -53,6 +53,11 @@ function Marketplace() {
     return APPS.find((app) => app.id === id) ?? null;
   }, [appParam]);
 
+  const lastPlayedApp = useMemo(() => {
+    const id = recentIds[0];
+    return id ? (APPS.find((app) => app.id === id) ?? null) : null;
+  }, [recentIds]);
+
   const [playerApp, setPlayerApp] = useState<AppItem | null>(null);
 
   const addRecent = useCallback(
@@ -112,7 +117,7 @@ function Marketplace() {
       <CategoryFilter activeCategory={activeCategory} onCategoryChange={setCategory} />
       <main className="flex-1 px-5 py-7">
         <div className="mx-auto max-w-[1200px]">
-          {isHomeView && <Hero />}
+          {isHomeView && <Hero lastPlayedApp={lastPlayedApp} onResume={playApp} />}
           <FavoritesSection
             apps={APPS}
             favoriteIds={favoriteIds}
