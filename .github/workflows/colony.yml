@@ -57,8 +57,6 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ github.token }}
       options: --user root --entrypoint ""
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
     permissions:
       id-token: write
       pull-requests: write
@@ -70,6 +68,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       ANTS_AI_KEY: ${{ secrets.ANTS_AI_KEY }}
+      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
 
     steps:
       - name: 🕳️ Descending into the Anthill
@@ -139,7 +138,7 @@ jobs:
       - name: 🛠️ Install Dependencies
         run: |
           apt-get update
-          apt-get install -y ripgrep docker.io
+          apt-get install -y ripgrep
 
       - name: ⚡ Install uv
         run: |
@@ -176,20 +175,6 @@ jobs:
                     ],
                     "command": "uvx"
                   },
-                  "github": {
-                    "command": "docker",
-                    "args": [
-                      "run",
-                      "-i",
-                      "--rm",
-                      "-e",
-                      "GITHUB_PERSONAL_ACCESS_TOKEN",
-                      "ghcr.io/github/github-mcp-server:v0.27.0"
-                    ],
-                    "env": {
-                      "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-                    }
-                  },
                   "playwright": {
                     "command": "npx",
                     "args": [
@@ -202,7 +187,10 @@ jobs:
                     "args": [
                       "-y",
                       "@modelcontextprotocol/server-brave-search"
-                    ]
+                    ],
+                    "env": {
+                      "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+                    }
                   }
                 },
                 "tools": {
