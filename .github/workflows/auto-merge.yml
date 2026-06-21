@@ -1,0 +1,30 @@
+name: 🔀 Auto Merge
+
+on:
+  workflow_run:
+    workflows: ["🐜 Ants Colony", "🧭 Realign Colony"]
+    types: [completed]
+
+jobs:
+  merge:
+    name: 🔀 Merge Ant PR
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: 🔀 Merge open ant PR
+        run: |
+          OPEN_PR=$(gh pr list --repo ${{ github.repository }} --state open \
+            --json number,commits \
+            --jq '[.[] | select(.commits[-1].commit.author.name | startswith("🐜"))] | first | .number')
+
+          if [[ -n "$OPEN_PR" && "$OPEN_PR" != "null" ]]; then
+            echo "🐜 Auto-merging ant PR #$OPEN_PR"
+            gh pr merge $OPEN_PR --repo ${{ github.repository }} --squash
+          else
+            echo "No open ant PR found — nothing to merge"
+          fi

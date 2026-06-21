@@ -2,7 +2,7 @@ name: 🐜 Ants Colony
 
 on:
   pull_request:
-    types: [opened, reopened, closed]
+    types: [closed]
   workflow_dispatch:
     inputs:
       name:
@@ -49,28 +49,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  auto-merge:
-    name: 🔀 Auto Merge
-    if: |
-      github.event_name == 'pull_request' &&
-      (github.event.action == 'opened' || github.event.action == 'reopened')
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
-    env:
-      GH_TOKEN: ${{ github.token }}
-    steps:
-      - name: 🔀 Merge if ant PR
-        run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          AUTHOR_NAME=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json commits --jq '.commits[-1].commit.author.name')
-          if [[ "$AUTHOR_NAME" =~ ^🐜 ]]; then
-            echo "🐜 Ant PR detected — auto-merging #$PR_NUMBER"
-            gh pr merge $PR_NUMBER --repo ${{ github.repository }} --squash
-          else
-            echo "👤 Human PR — skipping auto-merge"
-          fi
 
   working:
     name: 🐜 Ant Mission
