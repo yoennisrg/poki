@@ -37,6 +37,7 @@
 
 ## Decisiones recientes
 
+- **Hero de quick resume**: cuando el usuario tiene historial reciente, el hero de la homepage se convierte en un acceso directo al último juego, reduciendo el "time to fun" de varios clics a uno solo.
 - **Favoritos locales**: evita forzar login, aporta valor inmediato y reduce fricción de redescubrimiento.
 - **Empty state accionable**: transforma un callejón sin salida en una vía rápida de regreso al catálogo.
 - **Migración a React + Vite + TypeScript + TailwindCSS**: mejora mantenibilidad, tipado y escalabilidad del MVP manteniendo toda la funcionalidad previa.
