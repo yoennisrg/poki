@@ -108,7 +108,7 @@ function Marketplace() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header query={activeQuery} onQueryChange={setQuery} />
+      <Header query={activeQuery} onQueryChange={setQuery} onHomeClick={clearFilters} />
       <CategoryFilter activeCategory={activeCategory} onCategoryChange={setCategory} />
       <main className="flex-1 px-5 py-7">
         <div className="mx-auto max-w-[1200px]">

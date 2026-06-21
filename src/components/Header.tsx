@@ -1,20 +1,22 @@
 interface HeaderProps {
   query: string;
   onQueryChange: (query: string) => void;
+  onHomeClick?: () => void;
 }
 
-export function Header({ query, onQueryChange }: HeaderProps) {
+export function Header({ query, onQueryChange, onHomeClick }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-bg/92 backdrop-blur-md">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3.5">
-        <a
-          href="/"
-          className="flex shrink-0 items-center gap-2.5 text-xl font-bold tracking-tight text-text no-underline"
+        <button
+          type="button"
+          onClick={onHomeClick}
+          className="flex shrink-0 cursor-pointer items-center gap-2.5 text-xl font-bold tracking-tight text-text"
           aria-label="Poki inicio"
         >
           <span aria-hidden="true">🎮</span>
           <span>Poki</span>
-        </a>
+        </button>
         <div className="flex-1" style={{ maxWidth: 460 }} role="search">
           <label htmlFor="search-input" className="sr-only">
             Buscar juegos y apps
