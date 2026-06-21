@@ -52,6 +52,14 @@
         </div>
       </section>
 
+      <section class="section" id="recents-section" aria-labelledby="recents-title" hidden>
+        <div class="section__header">
+          <h2 id="recents-title" class="section__title">🕓 Jugados recientemente</h2>
+          <button class="section__action" id="clear-recents" type="button">Limpiar</button>
+        </div>
+        <div class="grid" id="recents-grid"></div>
+      </section>
+
       <section class="section" aria-labelledby="trending-title">
         <div class="section__header">
           <h2 id="trending-title" class="section__title">🔥 Tendencias</h2>
@@ -76,8 +84,23 @@
     </div>
   </footer>
 
+  <div class="modal modal--preview" id="preview-modal" role="dialog" aria-modal="true" aria-label="Vista previa de app" hidden>
+    <div class="modal__overlay" id="preview-overlay"></div>
+    <div class="modal__content modal__content--preview">
+      <button class="modal__close" id="preview-close-btn" aria-label="Cerrar vista previa">✕</button>
+      <div class="preview__icon" id="preview-icon" aria-hidden="true"></div>
+      <h2 class="preview__title" id="preview-title"></h2>
+      <div class="preview__meta">
+        <span class="preview__category" id="preview-category"></span>
+        <span class="preview__rating" id="preview-rating"></span>
+      </div>
+      <p class="preview__description" id="preview-description"></p>
+      <button class="preview__play" id="preview-play-btn" type="button">▶ Jugar ahora</button>
+    </div>
+  </div>
+
   <div class="modal" id="player-modal" role="dialog" aria-modal="true" aria-label="Reproductor de app" hidden>
-    <div class="modal__overlay" id="modal-overlay"></div>
+    <div class="modal__overlay" id="player-overlay"></div>
     <div class="modal__content">
       <div class="player__bar">
         <h3 class="player__title" id="player-title"></h3>
@@ -87,6 +110,14 @@
         </div>
       </div>
       <div class="player__frame-wrapper" id="player-wrapper">
+        <div class="player__loader" id="player-loader" hidden>
+          <span class="player__spinner" aria-hidden="true"></span>
+          <span>Cargando juego…</span>
+        </div>
+        <div class="player__error" id="player-error" hidden>
+          <p>No pudimos cargar el juego.</p>
+          <p class="player__error-hint">Puede deberse a restricciones del sitio externo. Prueba con otro título.</p>
+        </div>
         <iframe
           id="player-iframe"
           class="player__iframe"

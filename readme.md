@@ -77,9 +77,11 @@ Luego visita `http://localhost:8080`.
 ## ✨ Funcionalidades actuales
 
 - Catálogo de ejemplo con 12 apps/juegos.
-- Búsqueda en tiempo real.
+- Búsqueda en tiempo real (título, categoría y descripción).
 - Filtro por categoría.
 - Sección de tendencias.
-- Reproductor embebido en iframe sandboxed.
+- Vista previa de app con descripción antes de ejecutar.
+- Reproductor embebido en iframe sandboxed con indicador de carga y mensaje de fallback.
 - Pantalla completa y cierre con tecla `Esc`.
+- Historial de "Jugados recientemente" persistido en localStorage.
 - Diseño responsive para móvil y escritorio.
