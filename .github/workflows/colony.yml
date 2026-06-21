@@ -148,6 +148,7 @@ jobs:
         uses: 'google-github-actions/run-gemini-cli@v0.1.22'
         env:
           GEMINI_CLI_TRUST_WORKSPACE: true
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           gemini_api_key: ${{ secrets.ANTS_AI_KEY }}
           gemini_model: ${{ github.event.inputs.model || 'gemini-2.5-flash' }}
@@ -159,6 +160,9 @@ jobs:
                 "approvalMode": "yolo",
                 "debug": true,
                 "outputFormat": "stream-json",
+                "model": {
+                  "name": "gemini-2.5-flash"
+                },
                 "telemetry": {
                   "enabled": true,
                   "target": "local",
@@ -166,38 +170,24 @@ jobs:
                 },
                 "mcpServers": {
                   "git": {
-                    "args": [
-                      "mcp-server-git"
-                    ],
-                    "command": "uvx"
+                    "command": "uvx",
+                    "args": ["mcp-server-git"]
                   },
                   "github": {
                     "command": "docker",
                     "args": [
-                      "run",
-                      "-i",
-                      "--rm",
-                      "-e",
-                      "GITHUB_PERSONAL_ACCESS_TOKEN",
+                      "run", "-i", "--rm",
+                      "-e", "GITHUB_PERSONAL_ACCESS_TOKEN=${{ github.token }}",
                       "ghcr.io/github/github-mcp-server:v0.27.0"
-                    ],
-                    "env": {
-                      "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-                    }
+                    ]
                   },
                   "playwright": {
                     "command": "npx",
-                    "args": [
-                      "-y",
-                      "@modelcontextprotocol/server-playwright"
-                    ]
+                    "args": ["-y", "@playwright/mcp"]
                   },
                   "brave-search": {
                     "command": "npx",
-                    "args": [
-                      "-y",
-                      "@modelcontextprotocol/server-brave-search"
-                    ],
+                    "args": ["-y", "@modelcontextprotocol/server-brave-search"],
                     "env": {
                       "BRAVE_API_KEY": "BSAjMhL6aclOg6ZgjhnlO4E-BaKctko"
                     }
