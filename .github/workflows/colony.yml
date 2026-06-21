@@ -55,8 +55,7 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ github.token }}
-      entrypoint: [""]
-      options: --user root
+      options: --user root --entrypoint ""
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
     permissions:
