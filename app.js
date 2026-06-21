@@ -133,6 +133,7 @@
     recents: loadRecents(),
     favorites: loadFavorites(),
     playerLoadTimer: null,
+    previewAppId: null,
   };
 
   const els = {
@@ -250,6 +251,37 @@
 
   function getAppById(id) {
     return APPS.find((app) => app.id === id) || null;
+  }
+
+  function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    const rawApp = params.get("app");
+    return {
+      category: params.get("category") || "all",
+      query: params.get("q") || "",
+      appId: rawApp ? Number(rawApp) : NaN,
+    };
+  }
+
+  function buildShareableUrl(category, query, appId) {
+    const params = new URLSearchParams();
+    if (category && category !== "all") params.set("category", category);
+    if (query) params.set("q", query);
+    if (appId != null && !Number.isNaN(appId)) params.set("app", String(appId));
+    const qs = params.toString();
+    return qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+  }
+
+  function applyUrlParams(options = {}, { push = false } = {}) {
+    const category = Object.prototype.hasOwnProperty.call(options, "category") ? options.category : state.category;
+    const query = Object.prototype.hasOwnProperty.call(options, "query") ? options.query : state.query;
+    const appId = Object.prototype.hasOwnProperty.call(options, "appId") ? options.appId : state.previewAppId;
+    const url = buildShareableUrl(category, query, appId);
+    if (push) {
+      history.pushState({}, "", url);
+    } else {
+      history.replaceState({}, "", url);
+    }
   }
 
   function createCard(app) {
@@ -387,11 +419,14 @@
     renderRecents();
   }
 
-  function setCategory(category) {
+  function setCategory(category, { syncUrl = true } = {}) {
     state.category = category;
     els.categoriesList.querySelectorAll(".categories__btn").forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.category === category);
     });
+    if (syncUrl) {
+      applyUrlParams({ category: state.category }, { push: true });
+    }
     render();
   }
 
@@ -402,7 +437,8 @@
     setCategory("all");
   }
 
-  function openPreview(app) {
+  function openPreview(app, { syncUrl = true } = {}) {
+    state.previewAppId = app.id;
     els.previewIcon.textContent = app.icon;
     els.previewTitle.textContent = app.title;
     els.previewCategory.textContent = app.category;
@@ -412,6 +448,10 @@
     els.previewModal.hidden = false;
     document.body.style.overflow = "hidden";
     els.previewCloseBtn.focus();
+
+    if (syncUrl) {
+      applyUrlParams({ appId: app.id }, { push: true });
+    }
 
     const playHandler = () => {
       closePreview();
@@ -431,13 +471,17 @@
     els.previewFavoriteBtn.textContent = favorited ? "♥" : "♡";
   }
 
-  function closePreview() {
+  function closePreview({ syncUrl = true } = {}) {
+    state.previewAppId = null;
     els.previewModal.hidden = true;
     document.body.style.overflow = "";
     els.previewPlayBtn.onclick = null;
     els.previewPlayBtn.dataset.appId = "";
     els.previewFavoriteBtn.onclick = null;
     delete els.previewFavoriteBtn.dataset.favoriteId;
+    if (syncUrl) {
+      applyUrlParams({ appId: null }, { push: false });
+    }
   }
 
   function showPlayerLoader() {
@@ -498,6 +542,7 @@
   function init() {
     els.searchInput.addEventListener("input", (e) => {
       state.query = e.target.value;
+      applyUrlParams({ query: state.query }, { push: false });
       render();
     });
 
@@ -532,7 +577,26 @@
       }
     });
 
-    render();
+    window.addEventListener("popstate", () => {
+      const { category, query, appId } = getUrlParams();
+      state.query = query;
+      els.searchInput.value = query;
+      setCategory(category, { syncUrl: false });
+      if (!Number.isNaN(appId) && getAppById(appId)) {
+        openPreview(getAppById(appId), { syncUrl: false });
+      } else if (!els.previewModal.hidden) {
+        closePreview({ syncUrl: false });
+      }
+    });
+
+    const { category, query, appId } = getUrlParams();
+    state.query = query;
+    els.searchInput.value = query;
+    setCategory(category, { syncUrl: false });
+    if (!Number.isNaN(appId)) {
+      const app = getAppById(appId);
+      if (app) openPreview(app, { syncUrl: false });
+    }
   }
 
   init();
