@@ -11,6 +11,7 @@ export const APPS: AppItem[] = [
     url: "https://hexgl.bkcore.com/",
     description:
       "Compite en una carrera futurista anti-gravedad a toda velocidad por circuitos de neón.",
+    controls: { scheme: "keyboard", keys: "← →" },
   },
   {
     id: 2,
@@ -22,6 +23,7 @@ export const APPS: AppItem[] = [
     url: "https://martindrapeau.github.io/backbone-game-engine/super-mario-bros/index.html",
     description:
       "Salta, esquiva enemigos y recorre el primer nivel clásico de este plataformas retro.",
+    controls: { scheme: "keyboard", keys: "← → · Espacio" },
   },
   {
     id: 3,
@@ -33,6 +35,7 @@ export const APPS: AppItem[] = [
     url: "https://hextris.io/",
     description:
       "Gira el hexágono y encaja colores en este adictivo puzzle inspirado en Tetris.",
+    controls: { scheme: "hybrid", keys: "← →" },
   },
   {
     id: 4,
@@ -44,6 +47,7 @@ export const APPS: AppItem[] = [
     url: "https://basicallydan.github.io/skifree.js/",
     description:
       "Esquía cuesta abajo, esquiva obstáculos y trata de no ser atrapado por el yeti.",
+    controls: { scheme: "keyboard", keys: "← → ↑ ↓" },
   },
   {
     id: 5,
@@ -55,6 +59,7 @@ export const APPS: AppItem[] = [
     url: "https://cykod.github.io/AlienInvasion/",
     description:
       "Defiende la Tierra de oleadas de alienígenas en este shooter arcade de desplazamiento lateral.",
+    controls: { scheme: "keyboard", keys: "← → · Espacio" },
   },
   {
     id: 6,
@@ -66,6 +71,7 @@ export const APPS: AppItem[] = [
     url: "https://gabrielecirulli.github.io/2048/",
     description:
       "Desliza los números y combina fichas hasta alcanzar el mítico 2048.",
+    controls: { scheme: "hybrid", keys: "← → ↑ ↓" },
   },
   {
     id: 7,
@@ -77,6 +83,7 @@ export const APPS: AppItem[] = [
     url: "https://ellisonleao.github.io/clumsy-bird/",
     description:
       "Vuela entre tuberías en este divertido clon de Flappy Bird y bate tu propio récord.",
+    controls: { scheme: "hybrid", keys: "Espacio / toque" },
   },
   {
     id: 8,
@@ -88,6 +95,7 @@ export const APPS: AppItem[] = [
     url: "https://adarkroom.doublespeakgames.com/",
     description:
       "Descubre una historia oscura en este juego de texto, exploración e incremental.",
+    controls: { scheme: "mouse", keys: "Clic" },
   },
   {
     id: 9,
@@ -99,6 +107,7 @@ export const APPS: AppItem[] = [
     url: "https://codeartemis.github.io/TriggerRally/server/public/",
     description:
       "Conduce a toda velocidad por pistas de rally arcade en este juego de conducción web.",
+    controls: { scheme: "keyboard", keys: "← → ↑ ↓" },
   },
   {
     id: 10,
@@ -110,6 +119,7 @@ export const APPS: AppItem[] = [
     url: "https://the-house.arturkot.pl/",
     description:
       "Explora una casa misteriosa, resuelve acertijos y encuentra la salida en este point-and-click.",
+    controls: { scheme: "mouse", keys: "Clic" },
   },
   {
     id: 11,
@@ -121,6 +131,7 @@ export const APPS: AppItem[] = [
     url: "https://baruchel.insomnia247.nl/sudoku-js/sudoku.html",
     description:
       "Disfruta de sudokus con diferentes niveles de dificultad en una interfaz limpia.",
+    controls: { scheme: "mouse", keys: "Clic / toque" },
   },
   {
     id: 12,
@@ -132,6 +143,7 @@ export const APPS: AppItem[] = [
     url: "https://anirudhjoshi.github.io/fluid_table_tennis/",
     description:
       "Juega ping-pong sobre una simulación de fluidos a todo color y reacción rápida.",
+    controls: { scheme: "mouse", keys: "Mueve el ratón" },
   },
   {
     id: 13,
@@ -144,6 +156,7 @@ export const APPS: AppItem[] = [
     isLocal: true,
     description:
       "El clásico juego de la serpiente. Come, crece y evita chocar contigo mismo.",
+    controls: { scheme: "hybrid", keys: "Flechas o desliza" },
   },
 ];
 

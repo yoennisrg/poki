@@ -1,5 +1,22 @@
 import { useEffect, useRef } from "react";
-import type { AppItem } from "../types/app";
+import type { AppItem, AppControls } from "../types/app";
+
+function formatControlsLabel(controls?: AppControls): string | null {
+  if (!controls) return null;
+  const { scheme, keys } = controls;
+  switch (scheme) {
+    case "keyboard":
+      return `Teclado${keys ? `: ${keys}` : ""}`;
+    case "mouse":
+      return `Ratón${keys ? ` · ${keys}` : ""}`;
+    case "touch":
+      return `Táctil${keys ? ` · ${keys}` : ""}`;
+    case "hybrid":
+      return `Teclado / táctil${keys ? ` · ${keys}` : ""}`;
+    default:
+      return null;
+  }
+}
 
 interface PreviewModalProps {
   app: AppItem | null;
@@ -80,6 +97,12 @@ export function PreviewModal({
           )}
         </div>
         <p className="mb-4 text-sm leading-relaxed text-text-muted">{app.description}</p>
+        {app.controls && (
+          <p className="mb-4 flex items-center justify-center gap-2 text-xs text-text-muted">
+            <span aria-hidden="true">🎮</span>
+            <span>{formatControlsLabel(app.controls)}</span>
+          </p>
+        )}
         <button
           type="button"
           onClick={() => onPlay(app)}
