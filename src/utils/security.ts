@@ -12,6 +12,9 @@ export function sanitizeSearchInput(input: string): string {
 export function isValidHttpUrl(url: string): boolean {
   if (!url || typeof url !== "string" || url.trim() === "") return false;
 
+  // Reject protocol-relative URLs that could resolve to an arbitrary origin.
+  if (/^\s*\/\//.test(url)) return false;
+
   try {
     const parsed = new URL(url, window.location.href);
 

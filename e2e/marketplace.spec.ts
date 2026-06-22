@@ -82,4 +82,20 @@ test.describe("Security hardening", () => {
     await page.getByRole("button", { name: /Jugar ahora/i }).click();
     await expect(page.locator("iframe[src^='javascript:']")).toHaveCount(0);
   });
+
+  test("homepage declares a Content-Security-Policy meta tag", async ({ page }) => {
+    await page.goto("/");
+    const csp = page.locator('meta[http-equiv="Content-Security-Policy"]');
+    await expect(csp).toHaveAttribute("content", /default-src 'self'/);
+    await expect(csp).toHaveAttribute("content", /frame-src https:\/\/\* http:\/\/\*/);
+    await expect(csp).toHaveAttribute("content", /object-src 'none'/);
+  });
+
+  test("player iframe is sandboxed and omits referrer", async ({ page }) => {
+    await page.goto("/?app=13");
+    await page.getByRole("button", { name: /Jugar ahora/i }).click();
+    const iframe = page.locator("iframe[title='App embebida']");
+    await expect(iframe).toHaveAttribute("sandbox", "allow-scripts allow-same-origin");
+    await expect(iframe).toHaveAttribute("referrerpolicy", "no-referrer");
+  });
 });

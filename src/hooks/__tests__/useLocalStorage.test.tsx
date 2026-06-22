@@ -1,6 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { useLocalStorage } from "../useLocalStorage";
+import { isPositiveIntegerArray } from "../../utils/security";
 
 const TEST_KEY = "poki-test";
 
@@ -51,5 +52,30 @@ describe("useLocalStorage", () => {
       result.current[1]((prev) => [...prev, 2]);
     });
     expect(result.current[0]).toEqual([1, 2]);
+  });
+
+  it("uses the positive-integer validator for recents and favorites", () => {
+    localStorage.setItem(TEST_KEY, JSON.stringify([1, 2, 3]));
+    const { result } = renderHook(() => useLocalStorage<number[]>(TEST_KEY, [], isPositiveIntegerArray));
+    expect(result.current[0]).toEqual([1, 2, 3]);
+  });
+
+  it("rejects tampered recents that are not positive integers", () => {
+    localStorage.setItem(TEST_KEY, JSON.stringify([1, "<script>alert(1)</script>", 3]));
+    const { result } = renderHook(() => useLocalStorage<number[]>(TEST_KEY, [], isPositiveIntegerArray));
+    expect(result.current[0]).toEqual([]);
+  });
+
+  it("gracefully handles storage quota errors", () => {
+    const setItemSpy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Quota exceeded", "QuotaExceededError");
+    });
+    const { result } = renderHook(() => useLocalStorage<number[]>(TEST_KEY, [1]));
+    act(() => {
+      result.current[1]([2]);
+    });
+    expect(result.current[0]).toEqual([1]);
+    expect(() => localStorage.getItem(TEST_KEY)).not.toThrow();
+    setItemSpy.mockRestore();
   });
 });

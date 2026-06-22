@@ -22,15 +22,16 @@ export function useLocalStorage<T>(
 
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
-      try {
-        setStoredValue((prev) => {
-          const next = typeof value === "function" ? (value as (prev: T) => T)(prev) : value;
+      setStoredValue((prev) => {
+        const next = typeof value === "function" ? (value as (prev: T) => T)(prev) : value;
+        try {
           localStorage.setItem(key, JSON.stringify(next));
-          return next;
-        });
-      } catch {
-        // Ignore storage errors.
-      }
+        } catch {
+          // Ignore storage errors (e.g. quota exceeded, private mode).
+          return prev;
+        }
+        return next;
+      });
     },
     [key]
   );
