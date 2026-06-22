@@ -35,6 +35,15 @@
 - Verificar con Playwright siguiendo `.ants/pheromones/testing-ui.md`.
 - Guardar capturas en `screenshots/` y adjuntarlas al PR como comentario de evidencia.
 
+## DevOps y entrega continua
+
+- **Gestor de paquetes normalizado**: `pnpm` es el gestor oficial. El campo `packageManager` en `package.json` fija la versión y se eliminó el `package-lock.json` duplicado.
+- **CI en GitHub Actions**: el workflow `.github/workflows/ci.yml` ejecuta lint, type-check, tests unitarios y tests E2E de Playwright en cada PR y push a `main`.
+- **Release automatizado**: el workflow `.github/workflows/release.yml` construye y publica una imagen Docker en GHCR con tags semánticos cada vez que se empuja un tag `v*`.
+- **Docker multi-stage**: `Dockerfile` usa una etapa de build con Node.js + pnpm y una etapa de producción con nginx alpine para servir la SPA.
+- **Entorno local containerizado**: `docker-compose.yml` ofrece los servicios `app` (producción) y `dev` (desarrollo con live reload).
+- **Devcontainer**: `.devcontainer/devcontainer.json` permite abrir el proyecto en VS Code o GitHub Codespaces con dependencias y extensiones preinstaladas.
+
 ## Decisiones recientes
 
 - **Hero de quick resume**: cuando el usuario tiene historial reciente, el hero de la homepage se convierte en un acceso directo al último juego, reduciendo el "time to fun" de varios clics a uno solo.
@@ -43,3 +52,4 @@
 - **Migración a React + Vite + TypeScript + TailwindCSS**: mejora mantenibilidad, tipado y escalabilidad del MVP manteniendo toda la funcionalidad previa.
 - **Juego demo local (Snake)**: demuestra que el reproductor ejecuta realmente una app HTML5, no solo muestra una URL.
 - **URLs de juegos reales**: los placeholders de `example.com` se reemplazaron por juegos HTML5 open-source con cabeceras que permiten embebido en iframe, eliminando el error de "Example Domain" en el reproductor.
+- **CI/CD y dockerización**: se añadieron pipelines de integración continua, release automatizado de imagen Docker y entornos de desarrollo reproducibles para reducir la fricción del equipo.

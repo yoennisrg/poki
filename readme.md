@@ -44,34 +44,70 @@ La plataforma actúa como:
 
 > "Un App Store web donde todo se ejecuta instantáneamente en el navegador."
 
-## 🚀 Cómo ejecutar el MVP localmente
+## 🚀 Cómo ejecutar el proyecto localmente
 
-El MVP es una aplicación frontend pura (HTML, CSS y JavaScript) sin dependencias externas obligatorias.
+El proyecto usa **React + Vite + TypeScript + TailwindCSS v4**. El gestor de paquetes oficial es **pnpm**.
 
-### Opción 1: Abrir directamente
+### Requisitos
 
-Abre `index.html` en tu navegador.
+- [Node.js 22+](https://nodejs.org/)
+- [pnpm](https://pnpm.io/) (se habilita automáticamente con `corepack enable`)
+- [Docker](https://www.docker.com/) (opcional, para entornos containerizados)
 
-### Opción 2: Servidor local
+### Opción 1: Instalación local con pnpm
 
 ```bash
-# Con Python
-python3 -m http.server 8080
+# Instalar dependencias
+pnpm install
 
-# O con Node.js
-npx serve .
+# Servidor de desarrollo con hot reload
+pnpm dev
 ```
 
-Luego visita `http://localhost:8080`.
+Visita `http://localhost:5173`.
 
-## 🗂️ Estructura del MVP
+### Opción 2: Docker Compose (un solo comando)
+
+```bash
+# Entorno de desarrollo con live reload
+docker compose up dev
+
+# Build de producción servido por nginx
+docker compose up app
+```
+
+### Opción 3: Devcontainer / GitHub Codespaces
+
+Abre el repositorio en VS Code con la extensión Dev Containers o en GitHub Codespaces. El contenedor instalará las dependencias y expondrá el puerto `5173` automáticamente.
+
+## 🧪 Scripts disponibles
+
+```bash
+pnpm dev          # Servidor de desarrollo
+pnpm build        # Build de producción
+pnpm preview      # Previsualizar build de producción
+pnpm lint         # ESLint
+pnpm test         # Tests unitarios con Vitest
+pnpm test:e2e     # Tests E2E con Playwright
+```
+
+## 🗂️ Estructura del proyecto
 
 ```
 .
-├── index.html   # Estructura y accesibilidad
-├── styles.css   # Tema, layout responsive y componentes
-├── app.js       # Catálogo, filtros, búsqueda y reproductor
-└── readme.md    # Este archivo
+├── src/                  # Código fuente React + TypeScript
+├── public/               # Assets estáticos y juegos locales
+├── e2e/                  # Tests E2E con Playwright
+├── .github/workflows/    # CI/CD con GitHub Actions
+├── .devcontainer/        # Configuración de devcontainer
+├── Dockerfile            # Imagen de producción multi-stage
+├── docker-compose.yml    # Orquestación local
+├── nginx.conf            # Configuración de nginx para SPA
+├── package.json
+├── pnpm-lock.yaml
+├── tsconfig.json
+├── vite.config.ts
+└── readme.md
 ```
 
 ## ✨ Funcionalidades actuales
