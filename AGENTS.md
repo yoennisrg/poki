@@ -11,6 +11,7 @@
 - Persistencia en `localStorage` mediante `src/hooks/useLocalStorage.ts`:
   - `poki-recents`: array de IDs de apps jugadas recientemente (máx. 6).
   - `poki-favorites`: array de IDs de apps marcadas como favoritas.
+- **Dirección futura (en planificación)**: migrar el repositorio a un monorepo administrado con Nx. El frontend actual se convertirá en la app `apps/web` y se añadirá una app `apps/api` con NestJS + TypeORM + SQLite para soportar persistencia centralizada. Ver `docs/monorepo-migration-plan.md` para el plan detallado.
 
 ## Convenciones de UI
 
@@ -67,3 +68,4 @@
 - **Robustez de localStorage ante escrituras fallidas**: `useLocalStorage` conserva el estado previo cuando `localStorage.setItem` falla (quota exceeded, modo privado), evitando crashes silenciosos.
 - **Rechazo de URLs protocol-relative**: `isValidHttpUrl` rechaza explícitamente URLs que empiecen con `//`, cerrando un vector de redirección a orígenes arbitrarios.
 - **Controles de entrada por juego**: cada app en `src/data/apps.ts` declara un esquema de controles (`keyboard`, `touch`, `mouse`, `hybrid`) y, opcionalmente, las teclas/acciones. El `PlayerModal` usa `ControlBar` y `useIsTouchDevice` para mostrar ayuda contextual solo cuando aporta valor: los juegos de teclado no muestran overlay en desktop, pero advierten en dispositivos táctiles; los juegos híbridos o táctiles muestran pistas de toque en móvil. El `PreviewModal` muestra el esquema antes de jugar para reducir la fricción.
+- **Monorepo Nx con backend NestJS + TypeORM + SQLite**: se decide escalar la arquitectura desde SPA independiente a monorepo para separar frontend (`apps/web`) y backend (`apps/api`), permitiendo persistencia centralizada, APIs propias y escalabilidad futura del catálogo.
