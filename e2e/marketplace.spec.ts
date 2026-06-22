@@ -18,7 +18,9 @@ test.describe("Marketplace discovery", () => {
     await page.goto("/");
     await page.getByRole("searchbox", { name: /Buscar juegos y apps/i }).fill("snake");
     await expect(page).toHaveURL(/query=snake/);
-    await expect(page.getByText(/Retro Snake/i)).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: /Explorar todo/i }).getByText(/Retro Snake/i)
+    ).toBeVisible();
   });
 
   test("shows empty state and clears filters", async ({ page }) => {
