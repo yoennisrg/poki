@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { APPS, CATEGORIES } from "../apps";
+import { APPS } from "../apps";
+import { CATEGORIES } from "../categories";
 import { isLocalUrl, isValidHttpUrl } from "../../utils/security";
 
 const GAME_CATEGORIES = CATEGORIES.filter((category) => category !== "all");
