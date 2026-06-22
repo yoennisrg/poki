@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { BrowserRouter, useSearchParams } from "react-router-dom";
-import { APPS } from "./data/apps";
+import { useCatalog } from "./hooks/useCatalog";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { useQueryParam } from "./hooks/useQueryParam";
 import { Header } from "./components/Header";
@@ -10,6 +10,7 @@ import { FavoritesSection } from "./components/FavoritesSection";
 import { RecentsSection } from "./components/RecentsSection";
 import { TrendingSection } from "./components/TrendingSection";
 import { CatalogSection } from "./components/CatalogSection";
+import { CatalogStatus } from "./components/CatalogStatus";
 import { PreviewModal } from "./components/PreviewModal";
 import { PlayerModal } from "./components/PlayerModal";
 import { isPositiveIntegerArray, sanitizeSearchInput } from "./utils/security";
@@ -21,6 +22,7 @@ const FAVORITES_KEY = "poki-favorites";
 
 function Marketplace() {
   const [, setSearchParams] = useSearchParams();
+  const { apps: catalogApps, loading, error, refetch } = useCatalog();
   const [category, setCategory] = useQueryParam("category");
   const [query, setQuery] = useQueryParam("query");
   const [appParam, setAppParam] = useQueryParam("app");
@@ -33,7 +35,7 @@ function Marketplace() {
 
   const filteredApps = useMemo(() => {
     const q = activeQuery.toLowerCase();
-    return APPS.filter((app) => {
+    return catalogApps.filter((app) => {
       const matchesCategory = activeCategory === "all" || app.category === activeCategory;
       const matchesQuery =
         !q ||
@@ -42,7 +44,7 @@ function Marketplace() {
         app.description.toLowerCase().includes(q);
       return matchesCategory && matchesQuery;
     });
-  }, [activeCategory, activeQuery]);
+  }, [catalogApps, activeCategory, activeQuery]);
 
   const handleQueryChange = useCallback(
     (value: string) => {
@@ -56,18 +58,19 @@ function Marketplace() {
     [filteredApps]
   );
 
+  const findAppById = useCallback(
+    (id: number | null) => (id ? (catalogApps.find((app) => app.id === id) ?? null) : null),
+    [catalogApps]
+  );
+
   const previewApp = useMemo(() => {
     if (!appParam) return null;
-    const id = Number(appParam);
-    return APPS.find((app) => app.id === id) ?? null;
-  }, [appParam]);
+    return findAppById(Number(appParam));
+  }, [appParam, findAppById]);
 
-  const lastPlayedApp = useMemo(() => {
-    const id = recentIds[0];
-    return id ? (APPS.find((app) => app.id === id) ?? null) : null;
-  }, [recentIds]);
+  const lastPlayedApp = useMemo(() => findAppById(recentIds[0] ?? null), [recentIds, findAppById]);
 
-  const localApps = useMemo(() => APPS.filter((app) => app.isLocal), []);
+  const localApps = useMemo(() => catalogApps.filter((app) => app.isLocal), [catalogApps]);
 
   const [playerApp, setPlayerApp] = useState<AppItem | null>(null);
 
@@ -133,38 +136,43 @@ function Marketplace() {
       <main className="flex-1 px-5 py-7">
         <div className="mx-auto max-w-[1200px]">
           {isHomeView && <Hero lastPlayedApp={lastPlayedApp} onResume={playApp} />}
-          <FavoritesSection
-            apps={APPS}
-            favoriteIds={favoriteIds}
-            visible={isHomeView}
-            onOpen={openPreview}
-            onToggleFavorite={toggleFavorite}
-            onClear={clearFavorites}
-          />
-          <RecentsSection
-            apps={APPS}
-            recentIds={recentIds}
-            visible={isHomeView}
-            favoriteIds={favoriteIds}
-            onOpen={openPreview}
-            onToggleFavorite={toggleFavorite}
-            onClear={clearRecents}
-          />
-          <TrendingSection
-            apps={trendingApps}
-            visible={isHomeView}
-            favoriteIds={favoriteIds}
-            onOpen={openPreview}
-            onToggleFavorite={toggleFavorite}
-          />
-          <CatalogSection
-            apps={filteredApps}
-            filteredCount={filteredApps.length}
-            favoriteIds={favoriteIds}
-            onOpen={openPreview}
-            onToggleFavorite={toggleFavorite}
-            onClearFilters={clearFilters}
-          />
+          <CatalogStatus loading={loading} error={error} onRetry={refetch} />
+          {!loading && !error && (
+            <>
+              <FavoritesSection
+                apps={catalogApps}
+                favoriteIds={favoriteIds}
+                visible={isHomeView}
+                onOpen={openPreview}
+                onToggleFavorite={toggleFavorite}
+                onClear={clearFavorites}
+              />
+              <RecentsSection
+                apps={catalogApps}
+                recentIds={recentIds}
+                visible={isHomeView}
+                favoriteIds={favoriteIds}
+                onOpen={openPreview}
+                onToggleFavorite={toggleFavorite}
+                onClear={clearRecents}
+              />
+              <TrendingSection
+                apps={trendingApps}
+                visible={isHomeView}
+                favoriteIds={favoriteIds}
+                onOpen={openPreview}
+                onToggleFavorite={toggleFavorite}
+              />
+              <CatalogSection
+                apps={filteredApps}
+                filteredCount={filteredApps.length}
+                favoriteIds={favoriteIds}
+                onOpen={openPreview}
+                onToggleFavorite={toggleFavorite}
+                onClearFilters={clearFilters}
+              />
+            </>
+          )}
         </div>
       </main>
       <footer className="border-t border-white/[0.06] px-5 py-6 text-center text-sm text-text-muted">

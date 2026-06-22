@@ -7,8 +7,12 @@
   - Punto de entrada: `apps/web/src/main.tsx`, componente raíz `apps/web/src/App.tsx`.
   - Estado global manejado con hooks de React (`useState`, `useMemo`, `useCallback`).
   - Routing: `react-router-dom` (`BrowserRouter`) para sincronizar query params (`category`, `query`, `app`).
-  - Datos estáticos de apps en `apps/web/src/data/apps.ts`.
+  - Datos del catálogo se cargan desde `/api/apps` a través de `apps/web/src/lib/api.ts` y el store `apps/web/src/hooks/useCatalog.ts`.
+  - El dataset estático en `apps/web/src/data/apps.ts` se conserva como referencia/seed y ya no se usa en runtime.
+  - Categorías de filtro centralizadas en `apps/web/src/data/categories.ts` y alineadas con el backend.
+  - `CatalogStatus` muestra estados de carga y error del catálogo.
   - Tipos centralizados en `apps/web/src/types/app.ts`.
+  - Proxy de desarrollo en `apps/web/vite.config.ts` redirige `/api` a `http://localhost:3000`.
   - Persistencia en `localStorage` mediante `apps/web/src/hooks/useLocalStorage.ts`:
     - `poki-recents`: array de IDs de apps jugadas recientemente (máx. 6).
     - `poki-favorites`: array de IDs de apps marcadas como favoritas.
@@ -90,3 +94,4 @@
 - **Controles de entrada por juego**: cada app en `apps/web/src/data/apps.ts` declara un esquema de controles (`keyboard`, `touch`, `mouse`, `hybrid`) y, opcionalmente, las teclas/acciones. El `PlayerModal` usa `ControlBar` y `useIsTouchDevice` para mostrar ayuda contextual solo cuando aporta valor: los juegos de teclado no muestran overlay en desktop, pero advierten en dispositivos táctiles; los juegos híbridos o táctiles muestran pistas de toque en móvil. El `PreviewModal` muestra el esquema antes de jugar para reducir la fricción.
 - **Monorepo Nx con backend NestJS + TypeORM + SQLite**: se escala la arquitectura desde SPA independiente a monorepo para separar frontend (`apps/web`) y backend (`apps/api`), permitiendo persistencia centralizada, APIs propias y escalabilidad futura del catálogo.
 - **API de catálogo funcional**: el backend pasa de esqueleto a API completa con DTOs, validación estricta en el servidor, paginación, filtrado por categoría, creación/actualización/eliminación y semilla automática, estableciendo la fuente de verdad para el catálogo de apps.
+- **Integración frontend con API de catálogo**: el marketplace consume `/api/apps` vía un store reactivo (`useCatalog` + `CatalogStore`) que separa el estado global de la capa visual; la búsqueda y los filtros de categoría operan sobre los datos en vivo y se gestionan estados de carga/error con reintentos.

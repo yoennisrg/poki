@@ -1,5 +1,13 @@
 import type { AppItem } from "../types/app";
+import { CATEGORIES } from "./categories";
 
+export { CATEGORIES };
+
+/**
+ * Dataset estático de apps.
+ * @deprecated El catálogo se carga dinámicamente desde `/api/apps`. Se conserva
+ * como referencia y para tests de integridad de datos.
+ */
 export const APPS: AppItem[] = [
   {
     id: 1,
@@ -158,14 +166,4 @@ export const APPS: AppItem[] = [
       "El clásico juego de la serpiente. Come, crece y evita chocar contigo mismo.",
     controls: { scheme: "hybrid", keys: "Flechas o desliza" },
   },
-];
-
-export const CATEGORIES: string[] = [
-  "all",
-  "acción",
-  "aventura",
-  "puzzle",
-  "carreras",
-  "deportes",
-  "casual",
 ];

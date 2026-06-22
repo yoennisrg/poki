@@ -1,4 +1,4 @@
-import { CATEGORIES } from "../data/apps";
+import { CATEGORIES } from "../data/categories";
 
 interface CategoryFilterProps {
   activeCategory: string;
