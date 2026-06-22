@@ -1,4 +1,4 @@
-NEXT: uma
-REASON: Inicio del ciclo — Uma evalúa el estado del proyecto y decide el primer frente de trabajo
-TASK: Audita el repositorio, analiza los últimos PRs y define la siguiente mejora de mayor impacto para el usuario
-CONTEXT: El proyecto es un marketplace de juegos HTML5. Uma ha migrado el frontend a React + Vite + TypeScript + TailwindCSS. Los juegos deben poder ejecutarse desde la plataforma.
+NEXT: vesper
+REASON: El marketplace tiene flujos críticos (preview, player, favoritos, recents, filtros) sin cobertura de tests. Antes de seguir añadiendo features, necesitamos una red de seguridad que evite regresiones y valide la experiencia de usuario.
+TASK: Añadir tests de integración end-to-end con Playwright que cubran los CUJs principales: abrir preview desde el catálogo, jugar un demo local, marcar/desmarcar favoritos, limpiar recientes, filtrar por categoría/buscar, y recuperarse del error de carga de un juego externo.
+CONTEXT: Uma acaba de añadir el badge "Demo local" y mejorar el estado de error del reproductor. El proyecto usa React + Vite + TypeScript + TailwindCSS v4, react-router-dom para query params y localStorage para recientes/favoritos. No existe ningún test en el repositorio.

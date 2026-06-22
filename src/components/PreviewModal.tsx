@@ -70,9 +70,14 @@ export function PreviewModal({
             {isFavorite ? "♥" : "♡"}
           </button>
         </div>
-        <div className="mb-3 flex items-center justify-center gap-3 text-sm font-medium text-text-muted">
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-2 text-sm font-medium text-text-muted">
           <span className="uppercase tracking-wide">{app.category}</span>
           <span className="text-star">★ {app.rating.toFixed(1)}</span>
+          {app.isLocal && (
+            <span className="rounded-full bg-success/20 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-success">
+              Demo local
+            </span>
+          )}
         </div>
         <p className="mb-4 text-sm leading-relaxed text-text-muted">{app.description}</p>
         <button

@@ -141,6 +141,7 @@ export const APPS: AppItem[] = [
     rating: 4.8,
     icon: "🐍",
     url: "/games/snake/index.html",
+    isLocal: true,
     description:
       "El clásico juego de la serpiente. Come, crece y evita chocar contigo mismo.",
   },

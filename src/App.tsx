@@ -58,6 +58,8 @@ function Marketplace() {
     return id ? (APPS.find((app) => app.id === id) ?? null) : null;
   }, [recentIds]);
 
+  const localApps = useMemo(() => APPS.filter((app) => app.isLocal), []);
+
   const [playerApp, setPlayerApp] = useState<AppItem | null>(null);
 
   const addRecent = useCallback(
@@ -111,6 +113,11 @@ function Marketplace() {
     setPlayerApp(null);
   }, []);
 
+  const browseCatalog = useCallback(() => {
+    closePlayer();
+    clearFilters();
+  }, [closePlayer, clearFilters]);
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header query={activeQuery} onQueryChange={setQuery} onHomeClick={clearFilters} />
@@ -163,7 +170,14 @@ function Marketplace() {
         onPlay={playApp}
         onToggleFavorite={toggleFavorite}
       />
-      <PlayerModal key={playerApp?.id ?? "closed"} app={playerApp} onClose={closePlayer} />
+      <PlayerModal
+        key={playerApp?.id ?? "closed"}
+        app={playerApp}
+        onClose={closePlayer}
+        onBrowseCatalog={browseCatalog}
+        onOpenApp={openPreview}
+        localApps={localApps}
+      />
     </div>
   );
 }
