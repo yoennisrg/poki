@@ -42,3 +42,4 @@
 - **Empty state accionable**: transforma un callejón sin salida en una vía rápida de regreso al catálogo.
 - **Migración a React + Vite + TypeScript + TailwindCSS**: mejora mantenibilidad, tipado y escalabilidad del MVP manteniendo toda la funcionalidad previa.
 - **Juego demo local (Snake)**: demuestra que el reproductor ejecuta realmente una app HTML5, no solo muestra una URL.
+- **URLs de juegos reales**: los placeholders de `example.com` se reemplazaron por juegos HTML5 open-source con cabeceras que permiten embebido en iframe, eliminando el error de "Example Domain" en el reproductor.
