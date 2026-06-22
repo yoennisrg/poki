@@ -1,8 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { App } from './app.entity';
 import type { AppCategory } from './app.entity';
+
+export interface PaginatedAppsResult {
+  data: App[];
+  total: number;
+  limit: number;
+  offset: number;
+}
 
 @Injectable()
 export class AppsService {
@@ -11,8 +18,28 @@ export class AppsService {
     private readonly appRepository: Repository<App>
   ) {}
 
-  findAll(): Promise<App[]> {
-    return this.appRepository.find({ order: { id: 'ASC' } });
+  async findAll(options: {
+    category?: AppCategory;
+    limit: number;
+    offset: number;
+  }): Promise<PaginatedAppsResult> {
+    const where: FindManyOptions<App>['where'] = options.category
+      ? { category: options.category }
+      : {};
+
+    const [data, total] = await this.appRepository.findAndCount({
+      where,
+      order: { id: 'ASC' },
+      take: options.limit,
+      skip: options.offset,
+    });
+
+    return {
+      data,
+      total,
+      limit: options.limit,
+      offset: options.offset,
+    };
   }
 
   async findOne(id: number): Promise<App> {
@@ -23,12 +50,28 @@ export class AppsService {
     return app;
   }
 
-  findByCategory(category: AppCategory): Promise<App[]> {
-    return this.appRepository.find({ where: { category }, order: { id: 'ASC' } });
-  }
-
-  create(partial: Omit<App, 'id' | 'createdAt' | 'updatedAt'>): Promise<App> {
+  async create(
+    partial: Partial<Omit<App, 'id' | 'createdAt' | 'updatedAt'>>
+  ): Promise<App> {
     const app = this.appRepository.create(partial);
     return this.appRepository.save(app);
+  }
+
+  async update(
+    id: number,
+    partial: Omit<Partial<App>, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<App> {
+    const app = await this.findOne(id);
+    this.appRepository.merge(app, partial);
+    return this.appRepository.save(app);
+  }
+
+  async remove(id: number): Promise<void> {
+    const app = await this.findOne(id);
+    await this.appRepository.remove(app);
+  }
+
+  async count(): Promise<number> {
+    return this.appRepository.count();
   }
 }
