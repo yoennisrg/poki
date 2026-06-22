@@ -14,7 +14,16 @@
     - `poki-favorites`: array de IDs de apps marcadas como favoritas.
 - **Backend (`apps/api`)**: NestJS + TypeORM + SQLite.
   - Punto de entrada: `apps/api/src/main.ts`.
-  - Módulo de ejemplo: `apps/api/src/apps` expone la entidad `App` y endpoints REST bajo `/api/apps`.
+  - Módulo de catálogo: `apps/api/src/apps` expone la entidad `App`, DTOs validados con `class-validator` en `apps/api/src/apps/dto` y endpoints REST bajo `/api/apps`.
+  - Endpoints disponibles:
+    - `GET /api/apps?category=&limit=&offset=` — listado paginado con filtro por categoría.
+    - `GET /api/apps/:id` — detalle de una app.
+    - `POST /api/apps` — creación validada.
+    - `PATCH /api/apps/:id` — actualización parcial validada.
+    - `DELETE /api/apps/:id` — eliminación (HTTP 204).
+  - Validación global mediante `ValidationPipe` en `main.ts` (`whitelist`, `forbidNonWhitelisted`, `transform`).
+  - Semilla automática (`AppsSeeder`) inserta 13 apps de ejemplo si la tabla está vacía al arrancar.
+  - Configuración de migraciones TypeORM en `apps/api/typeorm.config.ts` apuntando a `apps/api/src/migrations`.
   - Base de datos SQLite en `apps/api/data/poki.sqlite` (ignorada por git).
 - Scripts principales (desde raíz):
   - `pnpm dev` → `nx serve web`.
@@ -80,3 +89,4 @@
 - **Rechazo de URLs protocol-relative**: `isValidHttpUrl` rechaza explícitamente URLs que empiecen con `//`, cerrando un vector de redirección a orígenes arbitrarios.
 - **Controles de entrada por juego**: cada app en `apps/web/src/data/apps.ts` declara un esquema de controles (`keyboard`, `touch`, `mouse`, `hybrid`) y, opcionalmente, las teclas/acciones. El `PlayerModal` usa `ControlBar` y `useIsTouchDevice` para mostrar ayuda contextual solo cuando aporta valor: los juegos de teclado no muestran overlay en desktop, pero advierten en dispositivos táctiles; los juegos híbridos o táctiles muestran pistas de toque en móvil. El `PreviewModal` muestra el esquema antes de jugar para reducir la fricción.
 - **Monorepo Nx con backend NestJS + TypeORM + SQLite**: se escala la arquitectura desde SPA independiente a monorepo para separar frontend (`apps/web`) y backend (`apps/api`), permitiendo persistencia centralizada, APIs propias y escalabilidad futura del catálogo.
+- **API de catálogo funcional**: el backend pasa de esqueleto a API completa con DTOs, validación estricta en el servidor, paginación, filtrado por categoría, creación/actualización/eliminación y semilla automática, estableciendo la fuente de verdad para el catálogo de apps.
