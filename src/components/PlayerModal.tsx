@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { ControlBar } from "./ControlBar";
 import { isLocalUrl, isValidHttpUrl } from "../utils/security";
 import type { AppItem } from "../types/app";
 
@@ -180,6 +181,7 @@ export function PlayerModal({ app, onClose, onBrowseCatalog, onOpenApp, localApp
             }}
             className="h-full w-full border-0"
           />
+          <ControlBar controls={app.controls} />
         </div>
       </div>
     </div>

@@ -1,3 +1,8 @@
+export interface AppControls {
+  scheme: "keyboard" | "touch" | "mouse" | "hybrid";
+  keys?: string;
+}
+
 export interface AppItem {
   id: number;
   title: string;
@@ -8,6 +13,7 @@ export interface AppItem {
   url: string;
   description: string;
   isLocal?: boolean;
+  controls?: AppControls;
 }
 
 export type Category = "all" | "acción" | "aventura" | "puzzle" | "carreras" | "deportes" | "casual";

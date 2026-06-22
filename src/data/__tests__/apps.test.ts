@@ -51,6 +51,18 @@ describe("APPS data integrity", () => {
       expect(isValidHttpUrl(app.url) || isLocalUrl(app.url), `URL for ${app.title}`).toBe(true);
     }
   });
+
+  it("uses a known control scheme when controls are defined", () => {
+    const validSchemes = ["keyboard", "touch", "mouse", "hybrid"];
+    for (const app of APPS) {
+      if (app.controls) {
+        expect(validSchemes, `control scheme for ${app.title}`).toContain(app.controls.scheme);
+        if (app.controls.keys !== undefined) {
+          expect(app.controls.keys.trim(), `control keys for ${app.title}`).not.toBe("");
+        }
+      }
+    }
+  });
 });
 
 describe("CATEGORIES data integrity", () => {
