@@ -35,6 +35,11 @@ export function AppCard({ app, isFavorite, onOpen, onToggleFavorite }: AppCardPr
       >
         {isFavorite ? "♥" : "♡"}
       </button>
+      {app.isLocal && (
+        <span className="absolute top-2.5 left-2.5 z-10 rounded-full bg-success/90 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-white shadow-sm">
+          Demo local
+        </span>
+      )}
       <div
         className="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-4xl"
         aria-hidden="true"

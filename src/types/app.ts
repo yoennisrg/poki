@@ -7,6 +7,7 @@ export interface AppItem {
   icon: string;
   url: string;
   description: string;
+  isLocal?: boolean;
 }
 
 export type Category = "all" | "acción" | "aventura" | "puzzle" | "carreras" | "deportes" | "casual";

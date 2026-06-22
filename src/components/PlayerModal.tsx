@@ -4,11 +4,14 @@ import type { AppItem } from "../types/app";
 interface PlayerModalProps {
   app: AppItem | null;
   onClose: () => void;
+  onBrowseCatalog?: () => void;
+  onOpenApp?: (app: AppItem) => void;
+  localApps?: AppItem[];
 }
 
 const PLAYER_LOAD_TIMEOUT_MS = 4000;
 
-export function PlayerModal({ app, onClose }: PlayerModalProps) {
+export function PlayerModal({ app, onClose, onBrowseCatalog, onOpenApp, localApps = [] }: PlayerModalProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -100,11 +103,55 @@ export function PlayerModal({ app, onClose }: PlayerModalProps) {
             </div>
           )}
           {error && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/70 p-5 text-center">
-              <p className="text-base font-semibold text-text">No pudimos cargar el juego.</p>
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-black/80 p-6 text-center">
+              <p className="text-lg font-semibold text-text">No pudimos cargar el juego</p>
               <p className="max-w-md text-sm text-text-muted">
-                Puede deberse a restricciones del sitio externo. Prueba con otro título.
+                {app.isLocal
+                  ? "El juego demo no está disponible en este momento. Puedes volver al catálogo y probar otro título."
+                  : "Este juego depende de un sitio externo que no respondió. Te recomendamos probar uno de nuestros demos locales."}
               </p>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="rounded-full border border-white/10 bg-surface-hover px-4 py-2 text-sm font-medium text-text transition hover:bg-white/[0.08]"
+                >
+                  Reintentar
+                </button>
+                {onBrowseCatalog && (
+                  <button
+                    type="button"
+                    onClick={onBrowseCatalog}
+                    className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-hover"
+                  >
+                    Volver al catálogo
+                  </button>
+                )}
+              </div>
+              {localApps.length > 0 && (
+                <div className="mt-2 w-full max-w-md">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
+                    Demos que funcionan ahora
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {localApps.map((localApp) => (
+                      <button
+                        key={localApp.id}
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          onOpenApp?.(localApp);
+                        }}
+                        className="flex items-center gap-2 rounded-full border border-white/10 bg-surface px-3 py-1.5 text-sm text-text transition hover:border-accent/45 hover:bg-surface-hover"
+                        title={`Ver ${localApp.title}`}
+                      >
+                        <span aria-hidden="true">{localApp.icon}</span>
+                        <span className="max-w-[140px] truncate">{localApp.title}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <iframe
