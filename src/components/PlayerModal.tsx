@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { isLocalUrl, isValidHttpUrl } from "../utils/security";
 import type { AppItem } from "../types/app";
 
 interface PlayerModalProps {
@@ -10,10 +11,16 @@ interface PlayerModalProps {
 }
 
 const PLAYER_LOAD_TIMEOUT_MS = 4000;
+const IFRAME_SANDBOX = "allow-scripts allow-same-origin";
+
+function isPlayableUrl(url: string): boolean {
+  return isLocalUrl(url) || isValidHttpUrl(url);
+}
 
 export function PlayerModal({ app, onClose, onBrowseCatalog, onOpenApp, localApps = [] }: PlayerModalProps) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const initialUrlValid = app ? isPlayableUrl(app.url) : true;
+  const [loading, setLoading] = useState(initialUrlValid);
+  const [error, setError] = useState(!initialUrlValid);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<number | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -26,6 +33,10 @@ export function PlayerModal({ app, onClose, onBrowseCatalog, onOpenApp, localApp
 
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
+
+    if (!isPlayableUrl(app.url)) {
+      return;
+    }
 
     timerRef.current = window.setTimeout(() => {
       setLoading(false);
@@ -159,7 +170,8 @@ export function PlayerModal({ app, onClose, onBrowseCatalog, onOpenApp, localApp
             title="App embebida"
             loading="lazy"
             allow="fullscreen"
-            sandbox="allow-scripts allow-same-origin allow-popups"
+            sandbox={IFRAME_SANDBOX}
+            referrerPolicy="no-referrer"
             onLoad={() => {
               setLoading(false);
               if (timerRef.current) {
