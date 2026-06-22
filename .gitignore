@@ -27,3 +27,7 @@ dist-ssr
 videos/
 test-results/
 playwright-report/
+*.sqlite
+*.sqlite3
+.nx/
+dist/
