@@ -17,7 +17,7 @@ RUN pnpm run build
 FROM nginx:1.27-alpine AS production
 
 # Copy the built assets and SPA nginx configuration
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist/apps/web /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
