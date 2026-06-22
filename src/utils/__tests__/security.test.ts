@@ -10,6 +10,15 @@ describe("sanitizeSearchInput", () => {
     const long = "a".repeat(200);
     expect(sanitizeSearchInput(long)).toHaveLength(120);
   });
+
+  it("returns empty string for whitespace-only input", () => {
+    expect(sanitizeSearchInput("   ")).toBe("");
+  });
+
+  it("does not interpret HTML or script tags", () => {
+    const xss = "<script>alert(1)</script>";
+    expect(sanitizeSearchInput(xss)).toBe(xss);
+  });
 });
 
 describe("isValidHttpUrl", () => {
@@ -29,6 +38,18 @@ describe("isValidHttpUrl", () => {
     expect(isValidHttpUrl("data:text/html,<script>alert(1)</script>")).toBe(false);
   });
 
+  it("rejects vbscript: URLs", () => {
+    expect(isValidHttpUrl("vbscript:msgbox(1)")).toBe(false);
+  });
+
+  it("rejects file: URLs", () => {
+    expect(isValidHttpUrl("file:///etc/passwd")).toBe(false);
+  });
+
+  it("rejects ftp: URLs", () => {
+    expect(isValidHttpUrl("ftp://example.com/game")).toBe(false);
+  });
+
   it("rejects empty values", () => {
     expect(isValidHttpUrl("")).toBe(false);
     expect(isValidHttpUrl("   ")).toBe(false);
@@ -36,6 +57,10 @@ describe("isValidHttpUrl", () => {
 
   it("accepts local absolute URLs", () => {
     expect(isValidHttpUrl("/games/snake/index.html")).toBe(true);
+  });
+
+  it("rejects protocol-relative URLs", () => {
+    expect(isValidHttpUrl("//evil.com/game")).toBe(false);
   });
 });
 
@@ -51,6 +76,11 @@ describe("isLocalUrl", () => {
   it("returns false for absolute external URLs", () => {
     expect(isLocalUrl("https://example.com")).toBe(false);
   });
+
+  it("returns false for empty or non-string values", () => {
+    expect(isLocalUrl("")).toBe(false);
+    expect(isLocalUrl("   ")).toBe(false);
+  });
 });
 
 describe("isPositiveIntegerArray", () => {
@@ -64,6 +94,15 @@ describe("isPositiveIntegerArray", () => {
 
   it("rejects arrays with non-positive numbers", () => {
     expect(isPositiveIntegerArray([1, 0, 3])).toBe(false);
+  });
+
+  it("rejects arrays with negative numbers", () => {
+    expect(isPositiveIntegerArray([1, -1, 3])).toBe(false);
+  });
+
+  it("rejects arrays with Infinity or NaN", () => {
+    expect(isPositiveIntegerArray([1, Infinity])).toBe(false);
+    expect(isPositiveIntegerArray([1, NaN])).toBe(false);
   });
 
   it("rejects non-arrays", () => {

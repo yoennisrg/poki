@@ -35,10 +35,18 @@
 - Verificar con Playwright siguiendo `.ants/pheromones/testing-ui.md`.
 - Guardar capturas en `screenshots/` y adjuntarlas al PR como comentario de evidencia.
 
+## Seguridad
+
+- **Sanitización de entradas**: `src/utils/security.ts` recorta y limita la longitud de búsquedas y query params; rechaza protocolos no permitidos (`javascript:`, `data:`, `vbscript:`, `file:`, `ftp:`) y URLs protocol-relative (`//`).
+- **Persistencia defensiva**: `src/hooks/useLocalStorage.ts` valida valores con type guards, ignora errores de parseo y conserva el estado previo ante fallos de escritura (p. ej. quota exceeded o modo privado).
+- **Iframe sandboxed**: `PlayerModal` usa `sandbox="allow-scripts allow-same-origin"`, `referrerPolicy="no-referrer"` y `allow="fullscreen"`; solo carga URLs locales o HTTP(S) validadas.
+- **CSP y headers**: `index.html` declara una Content-Security-Policy restrictiva; `nginx.conf` añade headers de seguridad esenciales (HSTS, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy) en la imagen de producción.
+- **Auditoría de dependencias**: el script `pnpm audit` verifica vulnerabilidades conocidas; se recomienda integrarlo en el workflow de CI para ejecutarlo en cada cambio.
+
 ## DevOps y entrega continua
 
 - **Gestor de paquetes normalizado**: `pnpm` es el gestor oficial. El campo `packageManager` en `package.json` fija la versión y se eliminó el `package-lock.json` duplicado.
-- **CI en GitHub Actions**: el workflow `.github/workflows/ci.yml` ejecuta lint, type-check, tests unitarios y tests E2E de Playwright en cada PR y push a `main`.
+- **CI en GitHub Actions**: el workflow `.github/workflows/ci.yml` ejecuta lint, type-check, `pnpm audit`, tests unitarios y tests E2E de Playwright en cada PR y push a `main`.
 - **Release automatizado**: el workflow `.github/workflows/release.yml` construye y publica una imagen Docker en GHCR con tags semánticos cada vez que se empuja un tag `v*`.
 - **Docker multi-stage**: `Dockerfile` usa una etapa de build con Node.js + pnpm y una etapa de producción con nginx alpine para servir la SPA.
 - **Entorno local containerizado**: `docker-compose.yml` ofrece los servicios `app` (producción) y `dev` (desarrollo con live reload).
@@ -53,3 +61,8 @@
 - **Juego demo local (Snake)**: demuestra que el reproductor ejecuta realmente una app HTML5, no solo muestra una URL.
 - **URLs de juegos reales**: los placeholders de `example.com` se reemplazaron por juegos HTML5 open-source con cabeceras que permiten embebido en iframe, eliminando el error de "Example Domain" en el reproductor.
 - **CI/CD y dockerización**: se añadieron pipelines de integración continua, release automatizado de imagen Docker y entornos de desarrollo reproducibles para reducir la fricción del equipo.
+- **Endurecimiento de seguridad del servidor**: `nginx.conf` añade headers de seguridad esenciales en la imagen de producción (HSTS, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy).
+- **Auditoría de dependencias**: se añadió el script `pnpm audit --audit-level moderate` para detectar vulnerabilidades conocidas; queda pendiente su integración en el workflow de CI.
+- **Validación de integridad de datos**: `src/data/__tests__/apps.test.ts` valida que cada app tenga campos requeridos, IDs únicos, categorías conocidas, ratings válidos y URLs seguras (locales o HTTP/S).
+- **Robustez de localStorage ante escrituras fallidas**: `useLocalStorage` conserva el estado previo cuando `localStorage.setItem` falla (quota exceeded, modo privado), evitando crashes silenciosos.
+- **Rechazo de URLs protocol-relative**: `isValidHttpUrl` rechaza explícitamente URLs que empiecen con `//`, cerrando un vector de redirección a orígenes arbitrarios.
