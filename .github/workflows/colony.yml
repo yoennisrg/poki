@@ -80,7 +80,7 @@ jobs:
             echo "AGENT=$AGENT_NAME" >> $GITHUB_ENV
             echo "📢 Direct call for ant: $AGENT_NAME"
           else
-            AUTHOR_NAME=$(gh pr view ${{ github.event.pull_request.number }} --json commits --jq '.commits[-1].commit.author.name')
+            AUTHOR_NAME=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits --jq '.[-1].commit.author.name')
             if [[ "$AUTHOR_NAME" =~ 🐜\ (.+) ]]; then
               CURRENT_ANT="${BASH_REMATCH[1]}"
               echo "🧬 DNA detected: Ant $CURRENT_ANT merged"
