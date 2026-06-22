@@ -1,12 +1,18 @@
 import { useCallback, useState } from "react";
 
-export function useLocalStorage<T>(key: string, initialValue: T) {
+export function useLocalStorage<T>(
+  key: string,
+  initialValue: T,
+  validator?: (value: unknown) => value is T
+) {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const raw = localStorage.getItem(key);
       if (raw) {
-        const parsed = JSON.parse(raw) as T;
-        return parsed;
+        const parsed = JSON.parse(raw) as unknown;
+        if (validator ? validator(parsed) : true) {
+          return parsed as T;
+        }
       }
     } catch {
       // Ignore storage/parse errors (e.g. private mode).

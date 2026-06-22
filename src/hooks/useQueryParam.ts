@@ -1,10 +1,24 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
+const MAX_QUERY_PARAM_LENGTH = 200;
+
+function sanitizeParam(input: string): string {
+  const trimmed = input.trim();
+  if (trimmed.length > MAX_QUERY_PARAM_LENGTH) {
+    return trimmed.slice(0, MAX_QUERY_PARAM_LENGTH);
+  }
+  return trimmed;
+}
+
 export function useQueryParam(key: string) {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const value = useMemo(() => searchParams.get(key) ?? undefined, [searchParams, key]);
+  const value = useMemo(() => {
+    const raw = searchParams.get(key);
+    if (!raw) return undefined;
+    return sanitizeParam(raw);
+  }, [searchParams, key]);
 
   const setValue = useCallback(
     (next: string | undefined) => {
@@ -14,7 +28,7 @@ export function useQueryParam(key: string) {
           if (next === undefined || next === "") {
             updated.delete(key);
           } else {
-            updated.set(key, next);
+            updated.set(key, sanitizeParam(next));
           }
           return updated;
         },

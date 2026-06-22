@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useSearchParams } from "react-router-dom";
 import { APPS } from "./data/apps";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { useQueryParam } from "./hooks/useQueryParam";
@@ -12,6 +12,7 @@ import { TrendingSection } from "./components/TrendingSection";
 import { CatalogSection } from "./components/CatalogSection";
 import { PreviewModal } from "./components/PreviewModal";
 import { PlayerModal } from "./components/PlayerModal";
+import { isPositiveIntegerArray, sanitizeSearchInput } from "./utils/security";
 import type { AppItem } from "./types/app";
 
 const MAX_RECENTS = 6;
@@ -19,18 +20,19 @@ const RECENTS_KEY = "poki-recents";
 const FAVORITES_KEY = "poki-favorites";
 
 function Marketplace() {
+  const [, setSearchParams] = useSearchParams();
   const [category, setCategory] = useQueryParam("category");
   const [query, setQuery] = useQueryParam("query");
   const [appParam, setAppParam] = useQueryParam("app");
-  const [recentIds, setRecentIds] = useLocalStorage<number[]>(RECENTS_KEY, []);
-  const [favoriteIds, setFavoriteIds] = useLocalStorage<number[]>(FAVORITES_KEY, []);
+  const [recentIds, setRecentIds] = useLocalStorage<number[]>(RECENTS_KEY, [], isPositiveIntegerArray);
+  const [favoriteIds, setFavoriteIds] = useLocalStorage<number[]>(FAVORITES_KEY, [], isPositiveIntegerArray);
 
   const activeCategory = category ?? "all";
-  const activeQuery = query ?? "";
+  const activeQuery = sanitizeSearchInput(query ?? "");
   const isHomeView = activeCategory === "all" && activeQuery === "";
 
   const filteredApps = useMemo(() => {
-    const q = activeQuery.trim().toLowerCase();
+    const q = activeQuery.toLowerCase();
     return APPS.filter((app) => {
       const matchesCategory = activeCategory === "all" || app.category === activeCategory;
       const matchesQuery =
@@ -41,6 +43,13 @@ function Marketplace() {
       return matchesCategory && matchesQuery;
     });
   }, [activeCategory, activeQuery]);
+
+  const handleQueryChange = useCallback(
+    (value: string) => {
+      setQuery(sanitizeSearchInput(value) || undefined);
+    },
+    [setQuery]
+  );
 
   const trendingApps = useMemo(
     () => filteredApps.filter((app) => app.trending),
@@ -85,9 +94,8 @@ function Marketplace() {
   const clearFavorites = useCallback(() => setFavoriteIds([]), [setFavoriteIds]);
 
   const clearFilters = useCallback(() => {
-    setQuery(undefined);
-    setCategory(undefined);
-  }, [setQuery, setCategory]);
+    setSearchParams(new URLSearchParams(), { replace: true });
+  }, [setSearchParams]);
 
   const openPreview = useCallback(
     (app: AppItem) => {
@@ -120,7 +128,7 @@ function Marketplace() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header query={activeQuery} onQueryChange={setQuery} onHomeClick={clearFilters} />
+      <Header query={activeQuery} onQueryChange={handleQueryChange} onHomeClick={clearFilters} />
       <CategoryFilter activeCategory={activeCategory} onCategoryChange={setCategory} />
       <main className="flex-1 px-5 py-7">
         <div className="mx-auto max-w-[1200px]">
