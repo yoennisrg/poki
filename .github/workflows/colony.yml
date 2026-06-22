@@ -136,6 +136,7 @@ jobs:
             -e BRANCH="main" \
             -e EMAIL="${{ env.AGENT }}@ants.io" \
             -e GH_TOKEN="${{ github.token }}" \
+            -e ANTS_GITHUB_TOKEN="${{ secrets.ANTS_GITHUG_TOKEN }}" \
             -e OPENCODE_API_KEY="${{ secrets.OPENCODE_API_KEY }}" \
             -e BRAVE_API_KEY="${{ secrets.BRAVE_API_KEY }}" \
             -v /var/run/docker.sock:/var/run/docker.sock \
