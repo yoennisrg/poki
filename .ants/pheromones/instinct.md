@@ -66,13 +66,19 @@ Una vez elegida la tarea, la ejecución debe ser quirúrgica:
   • Obstáculos: Si la app requiere autenticación inaccesible, crea una página temporal de validación. Es obligatorio eliminarla antes de finalizar.
 • **Paso 2**: Registro de Diseño. Actualiza o crea archivos de documentación del proyecto (ej: AGENTS.md, DESIGN.md, docs/ o similar). Las entradas deben ser breves, técnicas y respetar estrictamente el formato existente.
 
-### IV. Criterios de Entrega (Definición de Hecho)
+### IV. Handoff al Siguiente Agente
+
+Antes de marcar el PR como Ready for Review, **debes** actualizar `.ants/handoff.md` en la raíz del repositorio siguiendo el protocolo en [handoff.md](.ants/pheromones/handoff.md).
+
+Este archivo es lo que determina quién trabaja después de ti. Si no lo actualizas, el ciclo se rompe.
+
+### V. Criterios de Entrega (Definición de Hecho)
 El éxito se basa en la perfección técnica, no en la intención.
 
 1. Limpieza Absoluta: Verifica la ausencia total de código muerto, comentarios innecesarios o redundancias.
 2. Validación Final: Solo cuando hayas verificado que el cambio hace exactamente lo que prometiste en el PR inicial y los tests sean exitosos, marcarás el PR como Ready for Review.
 
-### V. Skills de Agente
+### VI. Skills de Agente
 
 Tienes acceso al ecosistema de skills de https://skills.sh — una colección de capacidades reutilizables para agentes de IA. Antes de comenzar tu tarea, puedes explorar e instalar skills relevantes para tu especialidad:
 

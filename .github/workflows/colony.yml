@@ -73,7 +73,7 @@ jobs:
         id: identify
         shell: bash
         run: |
-          SEQUENCE="${{ env.ANT_SEQUENCE }}"
+          VALID_ANTS="${{ env.ANT_SEQUENCE }}"
 
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             AGENT_NAME="${{ github.event.inputs.name }}"
@@ -85,23 +85,21 @@ jobs:
               CURRENT_ANT="${BASH_REMATCH[1]}"
               echo "🧬 DNA detected: Ant $CURRENT_ANT merged"
 
-              IFS=',' read -ra ANTS <<< "$SEQUENCE"
+              # Read handoff file to find next ant
               NEXT_ANT=""
-              for i in "${!ANTS[@]}"; do
-                if [[ "${ANTS[$i]}" == "$CURRENT_ANT" ]]; then
-                  NEXT_INDEX=$(( (i + 1) % ${#ANTS[@]} ))
-                  NEXT_ANT="${ANTS[$NEXT_INDEX]}"
-                  break
-                fi
-              done
+              if [[ -f ".ants/handoff.md" ]]; then
+                NEXT_ANT=$(grep -m1 "^NEXT:" .ants/handoff.md | sed 's/NEXT: *//' | tr -d '[:space:]')
+                echo "📋 Handoff says next: $NEXT_ANT"
+              fi
 
-              if [[ -z "$NEXT_ANT" ]]; then
-                echo "⚠️ Ant $CURRENT_ANT not in sequence, defaulting to uma"
+              # Validate ant name is in the allowed list
+              if [[ -z "$NEXT_ANT" ]] || ! echo ",$VALID_ANTS," | grep -q ",$NEXT_ANT,"; then
+                echo "⚠️ Invalid or missing handoff, defaulting to uma"
                 NEXT_ANT="uma"
               fi
 
               echo "AGENT=$NEXT_ANT" >> $GITHUB_ENV
-              echo "🔄 Next ant in sequence: $NEXT_ANT"
+              echo "🔄 Next ant from handoff: $NEXT_ANT"
             else
               echo "👤 Human PR merged — no ant to sequence"
               exit 0
