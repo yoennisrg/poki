@@ -39,12 +39,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
+      - name: 🐳 Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: 🏗️ Build and push
         uses: docker/build-push-action@v5
         with:
           context: .ants
           file: .ants/body
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: ghcr.io/${{ github.repository }}/ant-body:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
